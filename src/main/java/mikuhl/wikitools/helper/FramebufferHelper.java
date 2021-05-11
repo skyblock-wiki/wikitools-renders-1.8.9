@@ -31,7 +31,8 @@ public class FramebufferHelper {
 
     private static Framebuffer fbo;
 
-    public static Framebuffer createFrameBuffer(int width, int height) {
+    public static Framebuffer createFrameBuffer(int width, int height)
+    {
         fbo = Minecraft.getMinecraft().getFramebuffer();
         Framebuffer framebuffer = new Framebuffer(width, height, true);
         framebuffer.bindFramebuffer(true);
@@ -39,22 +40,27 @@ public class FramebufferHelper {
         return framebuffer;
     }
 
-    public static void clearFrameBuffer() {
+    public static void clearFrameBuffer()
+    {
         GlStateManager.clearColor(0, 0, 0, 0);
         GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
-    public static void restoreFrameBuffer(Framebuffer toDelete) {
+    public static void restoreFrameBuffer(Framebuffer toDelete)
+    {
         toDelete.deleteFramebuffer();
-        if (fbo != null) {
+        if (fbo != null)
+        {
             fbo.bindFramebuffer(true);
-        } else {
+        } else
+        {
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
             GL11.glViewport(0, 0, Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
         }
     }
 
-    public static BufferedImage readImage(Framebuffer framebuffer) {
+    public static BufferedImage readImage(Framebuffer framebuffer)
+    {
         int width = framebuffer.framebufferWidth;
         int height = framebuffer.framebufferHeight;
         IntBuffer pixels = BufferUtils.createIntBuffer(width * height);
@@ -68,7 +74,8 @@ public class FramebufferHelper {
         return bufferedimage;
     }
 
-    public static BufferedImage trimImage(BufferedImage image) {
+    public static BufferedImage trimImage(BufferedImage image)
+    {
         WritableRaster raster = image.getAlphaRaster();
         int width = raster.getWidth();
         int height = raster.getHeight();
@@ -80,9 +87,12 @@ public class FramebufferHelper {
         int minBottom = height - 1;
 
         top:
-        for (; top < bottom; top++) {
-            for (int x = 0; x < width; x++) {
-                if (raster.getSample(x, top, 0) != 0) {
+        for (; top < bottom; top++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (raster.getSample(x, top, 0) != 0)
+                {
                     minRight = x;
                     minBottom = top;
                     break top;
@@ -91,9 +101,12 @@ public class FramebufferHelper {
         }
 
         left:
-        for (; left < minRight; left++) {
-            for (int y = height - 1; y > top; y--) {
-                if (raster.getSample(left, y, 0) != 0) {
+        for (; left < minRight; left++)
+        {
+            for (int y = height - 1; y > top; y--)
+            {
+                if (raster.getSample(left, y, 0) != 0)
+                {
                     minBottom = y;
                     break left;
                 }
@@ -101,9 +114,12 @@ public class FramebufferHelper {
         }
 
         bottom:
-        for (; bottom > minBottom; bottom--) {
-            for (int x = width - 1; x >= left; x--) {
-                if (raster.getSample(x, bottom, 0) != 0) {
+        for (; bottom > minBottom; bottom--)
+        {
+            for (int x = width - 1; x >= left; x--)
+            {
+                if (raster.getSample(x, bottom, 0) != 0)
+                {
                     minRight = x;
                     break bottom;
                 }
@@ -111,9 +127,12 @@ public class FramebufferHelper {
         }
 
         right:
-        for (; right > minRight; right--) {
-            for (int y = bottom; y >= top; y--) {
-                if (raster.getSample(right, y, 0) != 0) {
+        for (; right > minRight; right--)
+        {
+            for (int y = bottom; y >= top; y--)
+            {
+                if (raster.getSample(right, y, 0) != 0)
+                {
                     break right;
                 }
             }
@@ -122,8 +141,10 @@ public class FramebufferHelper {
         return image.getSubimage(left, top, right - left + 1, bottom - top + 1);
     }
 
-    public static void saveBuffer(BufferedImage bufferedImage) {
-        try {
+    public static void saveBuffer(BufferedImage bufferedImage)
+    {
+        try
+        {
             File f = new File(WikiTools.MODID + "/", new Date().getTime() + ".png");
             Files.createParentDirs(f);
             f.createNewFile();
@@ -133,36 +154,49 @@ public class FramebufferHelper {
             ichatcomponent.getChatStyle().setUnderlined(true);
             ChatComponentTranslation success = new ChatComponentTranslation("screenshot.success", ichatcomponent);
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(success);
-        } catch (IOException error) {
+        } catch (IOException error)
+        {
             error.printStackTrace();
         }
     }
 
-    public static void drawEntityOnScreen(int posX, int posY, float scale, EntityLivingBase ent) {
-        GlStateManager.enableColorMaterial();
+    public static void drawEntityOnScreen(int posX, int posY, float scale, EntityLivingBase ent)
+    {
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) posX, (float) posY, 1.0F);
+        GlStateManager.enableColorMaterial();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableRescaleNormal();
+
+        //GlStateManager.enableDepth();
+        GlStateManager.translate((float) posX, (float) posY, 50.0F);
         GlStateManager.scale(-scale, scale, scale);
         GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(45.0F, 0.0F, -1.0F, 0.0F);
-        GlStateManager.rotate(30.0F, 1.0F, 0.0F, -1.0F);
-        GlStateManager.translate(0.0F, 0.0F, 0.0F);
+
+        if (WikiTools.getInstance().configs.specialRotation.getValue())
+        {
+            GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(45.0F, 0.0F, -1.0F, 0.0F);
+            GlStateManager.rotate(30.0F, 1.0F, 0.0F, -1.0F);
+            GlStateManager.translate(0.0F, 0.0F, 0.0F);
+        }
+
         RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
         rendermanager.setPlayerViewY(180.0F);
+        boolean oldShadows = rendermanager.isRenderShadow();
         rendermanager.setRenderShadow(false);
-        rendermanager.renderEntityWithPosYaw(ent, 0,0,0,0,1.0F);
+        rendermanager.renderEntityWithPosYaw(ent, 0, 0, 0, 0, 1.0F);
         // Fix colored things like sheep, and leather armor.
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        rendermanager.setRenderShadow(true);
-        GlStateManager.popMatrix();
+        rendermanager.setRenderShadow(oldShadows);
+
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableRescaleNormal();
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.disableTexture2D();
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.popMatrix();
     }
 
 }

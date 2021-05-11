@@ -1,31 +1,31 @@
 package mikuhl.wikitools.handler;
 
+import mikuhl.wikitools.WikiTools;
+import mikuhl.wikitools.WikiToolsConfigs;
 import mikuhl.wikitools.WikiToolsKeybinds;
 import mikuhl.wikitools.entity.EntityRenderClone;
-import mikuhl.wikitools.helper.FramebufferHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-
-import java.awt.image.BufferedImage;
-
-import static jdk.nashorn.internal.objects.Global.Infinity;
 
 public class EntityRenderHandler {
 
     private static boolean rendering = false;
 
     @SubscribeEvent
-    public void onKeyInputEvent(InputEvent.KeyInputEvent event) {
+    public void onKeyInputEvent(InputEvent.KeyInputEvent event)
+    {
+        if (WikiToolsKeybinds.HUD.isKeyDown())
+        {
+            WikiTools.getInstance().renderListener.openUI = true;
+            return;
+        }
 
         if (!WikiToolsKeybinds.RENDER.isKeyDown()) return;
 
@@ -36,24 +36,28 @@ public class EntityRenderHandler {
         MovingObjectPosition objectMouseOver = minecraft.objectMouseOver;
         Entity entityHit = objectMouseOver.entityHit;
 
-        boolean steve = WikiToolsKeybinds.STEVE_MODIFIER.isKeyDown();
-
         // Get the right entity
         EntityLivingBase entity = null;
-        if (entityHit instanceof EntityLivingBase) {
-            if (entityHit instanceof EntityOtherPlayerMP) {
-                entity = new EntityRenderClone(((EntityOtherPlayerMP) entityHit), steve);
-            } else {
+        if (entityHit instanceof EntityLivingBase)
+        {
+            if (entityHit instanceof EntityOtherPlayerMP)
+            {
+                entity = new EntityRenderClone(((EntityOtherPlayerMP) entityHit), false);
+            } else
+            {
                 NBTTagCompound nbt = entityHit.serializeNBT();
                 entity = ((EntityLivingBase) EntityList.createEntityFromNBT(nbt, minecraft.theWorld));
             }
-        } else if (WikiToolsKeybinds.SELF_MODIFIER.isKeyDown()) {
-            entity = new EntityRenderClone(minecraft.thePlayer, steve);
+        } else if (WikiToolsKeybinds.SELF_MODIFIER.isKeyDown())
+        {
+            entity = new EntityRenderClone(minecraft.thePlayer, false);
         }
 
         if (entity == null) return;
 
-        rendering = true;
+        WikiTools.getInstance().setEntity(entity);
+
+        /*rendering = true;
 
         // Disable red glow
         entity.hurtTime = 0;
@@ -67,7 +71,8 @@ public class EntityRenderHandler {
         // Set rotation
         entity.renderYawOffset = 0;
         entity.rotationYaw = 0;
-        entity.rotationPitch = 0;
+        // Head rotation pitch
+        entity.rotationPitch = 0f;
         entity.rotationYawHead = entity.rotationYaw;
         entity.prevRotationYawHead = entity.rotationYaw;
 
@@ -102,11 +107,11 @@ public class EntityRenderHandler {
             FramebufferHelper.restoreFrameBuffer(framebuffer);
         }
 
-        rendering = false;
+        rendering = false;*/
 
     }
 
-    private BufferedImage renderEntity(int height, float scale, EntityLivingBase entity, Framebuffer framebuffer) {
+    /*private BufferedImage renderEntity(int height, float scale, EntityLivingBase entity, Framebuffer framebuffer) {
 
         FramebufferHelper.clearFrameBuffer();
 
@@ -123,6 +128,6 @@ public class EntityRenderHandler {
 
     private int getLongest(BufferedImage image) {
         return Math.max(image.getWidth(), image.getHeight());
-    }
+    }*/
 
 }

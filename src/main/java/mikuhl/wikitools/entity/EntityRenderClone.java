@@ -17,7 +17,6 @@ public class EntityRenderClone extends AbstractClientPlayer {
         super(clone.worldObj, steve ? steveGameProfile : clone.getGameProfile());
         locationSkin = (steve ? this : clone).getLocationSkin();
         this.clonePlayer(clone, true);
-        if (WikiToolsKeybinds.INVISIBLE_MODIFIER.isKeyDown()) this.setInvisible(true);
     }
 
     @Override

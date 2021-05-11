@@ -12,24 +12,9 @@ public class WikiToolsKeybinds {
             Keyboard.KEY_M,
             category
     );
-    public static KeyBinding STEVE_MODIFIER = new KeyBinding(
-            "mikuhl.wikitool.steve.modifier.description",
-            Keyboard.KEY_RSHIFT,
-            category
-    );
-    public static KeyBinding ENCHANT_MODIFIER = new KeyBinding(
-            "mikuhl.wikitool.enchant.modifier.description",
-            Keyboard.KEY_RCONTROL,
-            category
-    );
     public static KeyBinding SELF_MODIFIER = new KeyBinding(
             "mikuhl.wikitool.self.modifier.description",
             Keyboard.KEY_RMENU,
-            category
-    );
-    public static KeyBinding INVISIBLE_MODIFIER = new KeyBinding(
-            "mikuhl.wikitool.invisible.modifier.description",
-            Keyboard.KEY_APPS,
             category
     );
     public static KeyBinding COPY_NBT = new KeyBinding(
@@ -37,13 +22,19 @@ public class WikiToolsKeybinds {
             Keyboard.KEY_N,
             category
     );
+    public static KeyBinding HUD = new KeyBinding(
+            "mikuhl.wikitool.hud",
+            Keyboard.KEY_K,
+            category
+    );
 
     public static void init() {
         ClientRegistry.registerKeyBinding(RENDER);
-        ClientRegistry.registerKeyBinding(STEVE_MODIFIER);
-        ClientRegistry.registerKeyBinding(ENCHANT_MODIFIER);
-        ClientRegistry.registerKeyBinding(SELF_MODIFIER);
-        ClientRegistry.registerKeyBinding(INVISIBLE_MODIFIER);
+        ClientRegistry.registerKeyBinding(HUD);
+        //ClientRegistry.registerKeyBinding(STEVE_MODIFIER);
+        //ClientRegistry.registerKeyBinding(ENCHANT_MODIFIER);
+        //ClientRegistry.registerKeyBinding(SELF_MODIFIER);
+        //ClientRegistry.registerKeyBinding(INVISIBLE_MODIFIER);
         ClientRegistry.registerKeyBinding(COPY_NBT);
     }
 }
