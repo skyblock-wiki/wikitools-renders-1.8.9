@@ -1,7 +1,6 @@
 package mikuhl.wikitools.entity;
 
 import com.mojang.authlib.GameProfile;
-import mikuhl.wikitools.WikiToolsKeybinds;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.util.ResourceLocation;
 

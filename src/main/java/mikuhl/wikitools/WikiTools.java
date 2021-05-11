@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -73,12 +72,6 @@ public class WikiTools {
         entity.rotationPitch = configs.headPitch.getValue();
         entity.rotationYawHead = configs.bodyYaw.getValue() + configs.headYaw.getValue();
         entity.prevRotationYawHead = configs.bodyYaw.getValue() + configs.headYaw.getValue();
-
-        /*if (configs.removeEnchants.getValue())
-            for (ItemStack itemStack : entity.getInventory())
-                if (itemStack != null) itemStack.getTagCompound().removeTag("ench");*/
-
-        entity.setInvisible(configs.invisible.getValue());
     }
 
     boolean rendering = false;

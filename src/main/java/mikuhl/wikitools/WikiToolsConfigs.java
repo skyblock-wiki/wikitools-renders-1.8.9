@@ -15,13 +15,6 @@ public class WikiToolsConfigs {
         }
     }
 
-    public class ButtonConfig extends WikiToolConfig {
-        public ButtonConfig(String name)
-        {
-            super(name);
-        }
-    }
-
     public class BooleanConfig extends WikiToolConfig {
         boolean value;
 
@@ -52,10 +45,6 @@ public class WikiToolsConfigs {
         }
     }
 
-    public ButtonConfig removeEnchants = new ButtonConfig("Remove Enchants");
-
-    public BooleanConfig steveProfile    = new BooleanConfig("New Clones Will Be Steve", false);
-    public BooleanConfig invisible       = new BooleanConfig("Invisible", false);
     public BooleanConfig specialRotation = new BooleanConfig("Special Rotation", true);
 
     public FloatConfig headPitch = new FloatConfig("Head Pitch", 0.0f);
