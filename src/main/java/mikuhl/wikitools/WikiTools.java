@@ -65,13 +65,13 @@ public class WikiTools {
         entity.posZ = Double.MAX_VALUE;
 
         // Set rotation
-        entity.renderYawOffset = configs.bodyYaw.getValue();
-        entity.prevRenderYawOffset = configs.bodyYaw.getValue();
+        entity.renderYawOffset = configs.bodyYaw;
+        entity.prevRenderYawOffset = configs.bodyYaw;
         entity.rotationYaw = 0;
         // Head rotation pitch
-        entity.rotationPitch = configs.headPitch.getValue();
-        entity.rotationYawHead = configs.bodyYaw.getValue() + configs.headYaw.getValue();
-        entity.prevRotationYawHead = configs.bodyYaw.getValue() + configs.headYaw.getValue();
+        entity.rotationPitch = configs.headPitch;
+        entity.rotationYawHead = configs.bodyYaw + configs.headYaw;
+        entity.prevRotationYawHead = configs.bodyYaw + configs.headYaw;
     }
 
     boolean rendering = false;

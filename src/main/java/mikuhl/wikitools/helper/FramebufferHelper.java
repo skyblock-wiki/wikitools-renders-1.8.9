@@ -174,7 +174,7 @@ public class FramebufferHelper {
         GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
         RenderHelper.enableStandardItemLighting();
 
-        if (WikiTools.getInstance().configs.specialRotation.getValue())
+        if (WikiTools.getInstance().configs.specialRotation)
         {
             GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(45.0F, 0.0F, -1.0F, 0.0F);

@@ -6,10 +6,9 @@ import mikuhl.wikitools.helper.FramebufferHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGhast;
@@ -22,7 +21,7 @@ import java.io.IOException;
 
 import static jdk.nashorn.internal.objects.Global.Infinity;
 
-public class WTGuiScreen extends GuiScreen {
+public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiResponder, GuiSlider.FormatHelper {
 
     public ResourceLocation uiImages = new ResourceLocation(WikiTools.MODID, "ui_components.png");
     boolean rendering = false;
@@ -45,32 +44,42 @@ public class WTGuiScreen extends GuiScreen {
         WTGuiButton steve = new WTGuiButton(4261,
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - 54) / 2,
                 100, 20,
-                "Set to Steve");
+                I18n.format("wikitools.gui.setSteve"));
         buttonList.add(steve);
 
         WTGuiButton invisible = new WTGuiButton(4262,
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - 10 - 40 - 54) / 2,
                 100, 20,
-                "Toggle Invisible");
+                I18n.format("wikitools.gui.toggleInvisible"));
         buttonList.add(invisible);
 
         WTGuiButton remove_enchants = new WTGuiButton(4263,
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 + -(10 + 40) * 2 - 54) / 2,
                 100, 20,
-                "Remove Enchants");
+                I18n.format("wikitools.gui.removeEnchants"));
         buttonList.add(remove_enchants);
 
         WTGuiButton remove_armour = new WTGuiButton(4264,
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 3 - 54) / 2,
                 100, 20,
-                "Remove Armour");
+                I18n.format("wikitools.gui.removeArmour"));
         buttonList.add(remove_armour);
 
         WTGuiButton remove_item = new WTGuiButton(4265,
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 4 - 54) / 2,
                 100, 20,
-                "Remove Held Item");
+                I18n.format("wikitools.gui.removeItem"));
         buttonList.add(remove_item);
+
+        GuiSlider headPitch = new GuiSlider(this, 4266,
+                anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 5 - 54) / 2,
+                I18n.format("wikitools.gui.headPitch"), -90.0f, 90.0f, 0.0f, this);
+        buttonList.add(headPitch);
+
+        GuiSlider headYaw = new GuiSlider(this, 4267,
+                anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 6 - 54) / 2,
+                I18n.format("wikitools.gui.headYaw"), -90.0f, 90.0f, 0.0f, this);
+        buttonList.add(headYaw);
     }
 
     @Override
@@ -118,13 +127,16 @@ public class WTGuiScreen extends GuiScreen {
                 if (bt instanceof WTGuiButton)
                     ((WTGuiButton) bt).setZLevel(600);
         }
+
         Minecraft.getMinecraft().getTextureManager().bindTexture(uiImages);
         // Draw Save Image Button
         DrawButton(anchorX + (width - offset - 32 - 14) / 2, anchorY - (height - offset - 14) / 2, mouseX, mouseY, 0, 0, 16, 16);
         // Draw Render Head Button
         DrawButton(anchorX + (width - offset - 32 * 2 - 4 - 14) / 2, anchorY - (height - offset - 14) / 2, mouseX, mouseY, 16, 0, 16, 16);
+        // Draw Render Skin Button
+        DrawButton(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, mouseX, mouseY, 48, 0, 16, 16);
         // Draw Copy Self Button
-        DrawButton(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, mouseX, mouseY, 32, 0, 16, 16);
+        DrawButton(anchorX + (width - offset - 32 * 4 - 4 * 3 - 14) / 2, anchorY - (height - offset - 14) / 2, mouseX, mouseY, 32, 0, 16, 16);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (WikiTools.getInstance().getEntity() instanceof EntityGhast)
@@ -211,6 +223,22 @@ public class WTGuiScreen extends GuiScreen {
                 rendering = true;
                 mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 
+                /*ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
+                ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
+                BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
+                FramebufferHelper.saveBuffer(bufferedImage);*/
+                rendering = false;
+            }
+        } // Check Render Skin Button
+        else if (CheckButton(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 16, mouseX, mouseY))
+        {
+            if (rendering) return;
+
+            if (WikiTools.getInstance().getEntity() instanceof AbstractClientPlayer)
+            {
+                rendering = true;
+                mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+
                 ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
                 ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
                 BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
@@ -218,7 +246,7 @@ public class WTGuiScreen extends GuiScreen {
                 rendering = false;
             }
         } // Check Copy Self Button
-        else if (CheckButton(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 16, mouseX, mouseY))
+        else if (CheckButton(anchorX + (width - offset - 32 * 4 - 4 * 3 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 16, mouseX, mouseY))
         {
             mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
             WikiTools.getInstance().setEntity(new EntityRenderClone(Minecraft.getMinecraft().thePlayer, false));
@@ -275,5 +303,38 @@ public class WTGuiScreen extends GuiScreen {
     private int getLongest(BufferedImage image)
     {
         return Math.max(image.getWidth(), image.getHeight());
+    }
+
+    @Override
+    public void func_175321_a(int p_175321_1_, boolean p_175321_2_)
+    {
+
+    }
+
+    @Override
+    public void onTick(int id, float value)
+    {
+        if (id == 4266)
+        {
+            WikiTools.getInstance().configs.headPitch = (int) value;
+            WikiTools.getInstance().setEntity(WikiTools.getInstance().getEntity());
+        }
+        else if (id == 4267)
+        {
+            WikiTools.getInstance().configs.headYaw = (int) value;
+            WikiTools.getInstance().setEntity(WikiTools.getInstance().getEntity());
+        }
+    }
+
+    @Override
+    public void func_175319_a(int p_175319_1_, String p_175319_2_)
+    {
+
+    }
+
+    @Override
+    public String getText(int id, String name, float value)
+    {
+        return name + ": " + (int) value;
     }
 }
