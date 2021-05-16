@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -69,6 +70,7 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 4 - 54) / 2,
                 100, 20,
                 I18n.format("wikitools.gui.removeItem"));
+        remove_item.enabled = false;
         buttonList.add(remove_item);
 
         GuiSlider headPitch = new GuiSlider(this, 4266,
@@ -186,8 +188,8 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
             rendering = true;
             mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 
-            int displayWidth = 1920;
-            int displayHeight = 1017;
+            int displayWidth = mc.displayWidth;
+            int displayHeight = mc.displayHeight;
             int shortest = Math.min(Math.min(displayWidth, displayHeight), 512);
 
             Framebuffer framebuffer = FramebufferHelper.createFrameBuffer(displayWidth, displayHeight);
@@ -220,14 +222,35 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
 
             if (WikiTools.getInstance().getEntity() instanceof AbstractClientPlayer)
             {
-                rendering = true;
-                mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                try
+                {
+                    rendering = true;
+                    mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 
-                /*ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
-                ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
-                BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
-                FramebufferHelper.saveBuffer(bufferedImage);*/
-                rendering = false;
+                    ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
+                    ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
+                    BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
+                    BufferedImage icon = new BufferedImage(8, 8, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D G2D = icon.createGraphics();
+                    G2D.drawImage(bufferedImage.getSubimage(8, 8, 8, 8), 0, 0, null);
+                    G2D.drawImage(bufferedImage.getSubimage(40, 8, 8, 8), 0, 0, null);
+                    G2D.dispose();
+
+                    BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g = newImage.createGraphics();
+                    //g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    g.clearRect(0, 0, 64, 64);
+                    g.drawImage(icon, 0, 0, 64, 64, null);
+                    g.dispose();
+
+                    FramebufferHelper.saveBuffer(newImage);
+
+                    rendering = false;
+                } catch (Exception e)
+                {
+                    System.out.println(e);
+                    rendering = false;
+                }
             }
         } // Check Render Skin Button
         else if (CheckButton(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 16, mouseX, mouseY))
@@ -274,10 +297,16 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 WikiTools.getInstance().getEntity().getHeldItem().getTagCompound().removeTag("ench");
         } else if (button.id == 4264) // Remove Armour
         {
-            WikiTools.getInstance().getEntity().setCurrentItemOrArmor(1, null);
-            WikiTools.getInstance().getEntity().setCurrentItemOrArmor(2, null);
-            WikiTools.getInstance().getEntity().setCurrentItemOrArmor(3, null);
-            WikiTools.getInstance().getEntity().setCurrentItemOrArmor(4, null);
+            try
+            {
+                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, null);
+                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(1, null);
+                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(2, null);
+                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(3, null);
+            } catch (Exception e)
+            {
+                System.out.println(e);
+            }
         } else if (button.id == 4265) // Remove Held Item
         {
             WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, null);
@@ -318,8 +347,7 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
         {
             WikiTools.getInstance().configs.headPitch = (int) value;
             WikiTools.getInstance().setEntity(WikiTools.getInstance().getEntity());
-        }
-        else if (id == 4267)
+        } else if (id == 4267)
         {
             WikiTools.getInstance().configs.headYaw = (int) value;
             WikiTools.getInstance().setEntity(WikiTools.getInstance().getEntity());
