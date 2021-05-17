@@ -1,7 +1,8 @@
 mikuhl.wikitool.category=Wikitools
 mikuhl.wikitool.copy.nbt.description=Copy NBT
-mikuhl.wikitool.hud=Open GUI
 mikuhl.wikitool.render.description=Copy Entity
+wikitools.keybind.hud=Open GUI
+wikitools.keybind.skullID=Copy Skull ID
 wikitools.message.entityCopied=Wikitools: Entity Copied
 wikitools.gui.setSteve=Set to Steve
 wikitools.gui.toggleInvisible=Toggle Invisible

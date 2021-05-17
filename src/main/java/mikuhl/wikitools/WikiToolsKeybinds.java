@@ -23,18 +23,20 @@ public class WikiToolsKeybinds {
             category
     );
     public static KeyBinding HUD = new KeyBinding(
-            "mikuhl.wikitool.hud",
+            "wikitools.keybind.hud",
             Keyboard.KEY_K,
+            category
+    );
+    public static KeyBinding COPY_SKULL_ID = new KeyBinding(
+            "wikitools.keybind.skullID",
+            Keyboard.KEY_Z,
             category
     );
 
     public static void init() {
         ClientRegistry.registerKeyBinding(RENDER);
-        ClientRegistry.registerKeyBinding(HUD);
-        //ClientRegistry.registerKeyBinding(STEVE_MODIFIER);
-        //ClientRegistry.registerKeyBinding(ENCHANT_MODIFIER);
-        //ClientRegistry.registerKeyBinding(SELF_MODIFIER);
-        //ClientRegistry.registerKeyBinding(INVISIBLE_MODIFIER);
         ClientRegistry.registerKeyBinding(COPY_NBT);
+        ClientRegistry.registerKeyBinding(HUD);
+        ClientRegistry.registerKeyBinding(COPY_SKULL_ID);
     }
 }

@@ -14,3 +14,7 @@ Minecraft mod to copy NBT and render entities
 * Copy NBT
   * **Key**: N
   * **Description**: Copy NBT to your clipboard of the entity you are looking at, or the item you are hovering over.
+
+* Copy Skull ID
+  * **Key**: Z
+  * **Description**: Copy the Skull you are hovering over's Texture ID (That links to http://textures.minecraft.net/texture/<ID>) to your clipboard.
