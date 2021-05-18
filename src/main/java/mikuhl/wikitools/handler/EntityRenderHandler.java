@@ -57,7 +57,7 @@ public class EntityRenderHandler {
         if (entity == null) return;
 
         WikiTools.getInstance().setEntity(entity);
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.entityCopied")));
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedEntity")));
 
     }
 

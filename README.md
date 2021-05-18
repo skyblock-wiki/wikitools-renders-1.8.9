@@ -18,7 +18,7 @@ When Advanced Tooltips are enabled, the Skyblock ID will be shown in the item's 
 
 * Copy Skull ID
   * **Key**: Z
-  * **Description**: Copy the Skull you are hovering over's Texture ID (That links to http://textures.minecraft.net/texture/<ID>) to your clipboard.
+  * **Description**: Copy a Skull's Texture ID (That links to http://textures.minecraft.net/texture/<ID>) to your clipboard. Works on placed Skulls,  Entities wearing skulls (excluding Players), and Skull items you are hovering over.
   
 * Copy Wiki Tooltip
   * **Key**: X
