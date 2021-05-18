@@ -11,7 +11,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -25,7 +24,7 @@ public class EntityRenderHandler {
     {
         if (WikiToolsKeybinds.HUD.isKeyDown())
         {
-            WikiTools.getInstance().renderListener.openUI = true;
+            WikiTools.getInstance().listeners.openUI = true;
             return;
         }
 

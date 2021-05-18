@@ -1,7 +1,7 @@
 package mikuhl.wikitools;
 
 import mikuhl.wikitools.helper.FramebufferHelper;
-import mikuhl.wikitools.listeners.RenderListener;
+import mikuhl.wikitools.listeners.Listeners;
 import mikuhl.wikitools.proxy.CommonProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -24,7 +24,7 @@ public class WikiTools {
     private static WikiTools instance;
     public WikiToolsConfigs configs;
 
-    public RenderListener   renderListener;
+    public Listeners        listeners;
     public EntityLivingBase entity = null;
 
     public WikiTools()

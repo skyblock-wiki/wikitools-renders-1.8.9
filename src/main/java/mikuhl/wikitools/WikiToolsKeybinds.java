@@ -32,11 +32,17 @@ public class WikiToolsKeybinds {
             Keyboard.KEY_Z,
             category
     );
+    public static KeyBinding COPY_WIKI_TOOLTIP = new KeyBinding(
+            "wikitools.keybind.tooltip",
+            Keyboard.KEY_X,
+            category
+    );
 
     public static void init() {
         ClientRegistry.registerKeyBinding(RENDER);
         ClientRegistry.registerKeyBinding(COPY_NBT);
         ClientRegistry.registerKeyBinding(HUD);
         ClientRegistry.registerKeyBinding(COPY_SKULL_ID);
+        ClientRegistry.registerKeyBinding(COPY_WIKI_TOOLTIP);
     }
 }

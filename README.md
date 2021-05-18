@@ -1,5 +1,6 @@
 # wikitools
-Minecraft mod to copy NBT and render entities
+Minecraft mod to copy NBT, render entities and other things.
+When Advanced Tooltips are enabled, the Skyblock ID will be shown in the item's tooltip.
 
 ## Keybinds
 
@@ -18,3 +19,7 @@ Minecraft mod to copy NBT and render entities
 * Copy Skull ID
   * **Key**: Z
   * **Description**: Copy the Skull you are hovering over's Texture ID (That links to http://textures.minecraft.net/texture/<ID>) to your clipboard.
+  
+* Copy Wiki Tooltip
+  * **Key**: X
+  * **Description**: Copy the item you are hovering over's generated Wiki Tooltip to your clipboard.
