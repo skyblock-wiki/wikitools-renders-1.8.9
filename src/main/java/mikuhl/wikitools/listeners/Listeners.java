@@ -25,6 +25,8 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.codec.binary.Base64;
 import org.lwjgl.input.Keyboard;
 
@@ -44,8 +46,11 @@ public class Listeners {
     }
 
     @SubscribeEvent
-    public void checkForInventoryButtons(GuiScreenEvent.KeyboardInputEvent event)
+    public void checkForInventoryButtons(GuiScreenEvent.KeyboardInputEvent.Pre event)
     {
+        if (!Keyboard.getEventKeyState())
+            return;
+
         if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_SKULL_ID.getKeyCode()))
         {
             if (event.gui instanceof GuiContainer)
@@ -80,7 +85,7 @@ public class Listeners {
                 if (is == null)
                     return;
                 String ID = "['" + is.getDisplayName().replaceAll("\u00A7.", "") + "']";
-                String name = "name='" + is.getDisplayName().replaceAll("\u00A7.", "") + "'";
+                String name = "name = '" + is.getDisplayName().replaceAll("\u00A7.", "") + "'";
                 String title = "title = '" + is.getDisplayName().replaceAll("\u00A7", "&") + "'";
                 String text = "text = '";
                 if (is.hasTagCompound() &&
@@ -149,9 +154,9 @@ public class Listeners {
                     entity.writeToNBT(nbt);
 
                     if (!nbt.hasKey("Equipment") ||
-                            !nbt.getTagList("Equipment",10).getCompoundTagAt(4).getCompoundTag("tag").hasKey("SkullOwner"))
+                            !nbt.getTagList("Equipment", 10).getCompoundTagAt(4).getCompoundTag("tag").hasKey("SkullOwner"))
                         return;
-                    String base64 = nbt.getTagList("Equipment",10).getCompoundTagAt(4).getCompoundTag("tag").getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", 10).getCompoundTagAt(0).getString("Value");
+                    String base64 = nbt.getTagList("Equipment", 10).getCompoundTagAt(4).getCompoundTag("tag").getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", 10).getCompoundTagAt(0).getString("Value");
                     JsonElement decoded = new JsonParser().parse(new String(Base64.decodeBase64(base64)));
                     String skullID = decoded.getAsJsonObject().getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString().split("/")[4];
 
