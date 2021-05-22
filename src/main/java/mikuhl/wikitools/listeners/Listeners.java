@@ -13,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,8 +26,6 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.codec.binary.Base64;
 import org.lwjgl.input.Keyboard;
 
@@ -97,7 +96,8 @@ public class Listeners {
                     {
                         if (i > 0)
                             text += "/";
-                        text += lore.getStringTagAt(i).replaceAll("\u00A7", "&");
+                        text += lore.getStringTagAt(i).replaceAll("\u00A7", "&")
+                                .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
                     }
                 }
                 text += "'";
@@ -105,6 +105,114 @@ public class Listeners {
                 ClipboardHelper.setClipboard(ID + " = {" + name + ", " + title + ", " + text + ",},");
 
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedTooltip")));
+            }
+        } else if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode()))
+        {
+            boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+            boolean sprint = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSprint.getKeyCode());
+
+            String close = "\n|close=none";
+            String arrow = "\n|arrow=none";
+            String goback = "";
+
+            if (event.gui instanceof GuiContainer)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+
+                if (mc.thePlayer.openContainer instanceof ContainerChest)
+                {
+                    ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
+                    String ui = "{{UI|" + chest.getLowerChestInventory().getName() + (shift ? "|fill=false" : "");
+
+                    for (int i = 0; i < chest.getLowerChestInventory().getSizeInventory(); i++)
+                    {
+                        if (i % 9 == 0 && i != 0)
+                            ui += "\n|-";
+
+                        if (!chest.getSlot(i).getHasStack())
+                        {
+                            if (!shift)
+                                ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "= , none";
+                            continue;
+                        }
+                        if (chest.getSlot(i).getStack().hasDisplayName())
+                            if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" "))
+                            {
+                                if (shift)
+                                    ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=Blank, none";
+                                continue;
+                            } else if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase("\u00A7cClose"))
+                            {
+                                close = "\n|close=" + ((i / 9) + 1) + ", " + ((i % 9) + 1);
+                                continue;
+                            } else if (chest.getSlot(i).getStack().getItem().getUnlocalizedName().equalsIgnoreCase("item.arrow")
+                                    && chest.getSlot(i).getStack().getDisplayName().contains("Back"))
+                            {
+                                arrow = "\n|arrow=" + ((i / 9) + 1) + ", " + ((i % 9) + 1);
+                                if (chest.getSlot(i).getStack().hasTagCompound() &&
+                                        chest.getSlot(i).getStack().getTagCompound().hasKey("display") &&
+                                        chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").hasKey("Lore"))
+                                {
+                                    goback = "\n|goback=";
+                                    NBTTagList lore = chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
+                                    for (int l = 0; l < lore.tagCount(); l++)
+                                    {
+                                        if (l > 0)
+                                            goback += "/";
+                                        goback += lore.getStringTagAt(l).replaceAll("\u00A7", "&")
+                                                .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
+                                    }
+                                }
+                                continue;
+                            }
+
+                        ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=";
+
+                        if (chest.getSlot(i).getStack().getItem() instanceof ItemSkull
+                                || (!sprint
+                                && chest.getSlot(i).getStack().hasTagCompound()
+                                && chest.getSlot(i).getStack().getTagCompound().hasKey("ExtraAttributes")
+                                && chest.getSlot(i).getStack().getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")
+                                && !chest.getLowerChestInventory().getName().contains("Collection")))
+                        {
+                            ui += chest.getSlot(i).getStack().getDisplayName().replaceAll("\u00A7.", "");
+                        } else
+                            ui += chest.getSlot(i).getStack().getItem().getItemStackDisplayName(chest.getSlot(i).getStack());
+
+                        if (chest.getSlot(i).getStack().stackSize > 1)
+                            ui += "; " + chest.getSlot(i).getStack().stackSize;
+
+                        ui += ", none, " + chest.getSlot(i).getStack().getDisplayName().replaceAll("\u00A7", "&")
+                                + ",";
+                        if (chest.getSlot(i).getStack().hasTagCompound() &&
+                                chest.getSlot(i).getStack().getTagCompound().hasKey("display") &&
+                                chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").hasKey("Lore"))
+                        {
+                            NBTTagList lore = chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
+                            for (int l = 0; l < lore.tagCount(); l++)
+                            {
+                                if (l > 0)
+                                    ui += "/";
+                                ui += lore.getStringTagAt(l).replaceAll("\u00A7", "&")
+                                        .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
+                            }
+                        } else
+                            ui += "none";
+                    }
+
+                    if (!close.equalsIgnoreCase("\n|close=6, 5"))
+                        ui += close;
+                    if (!arrow.equalsIgnoreCase("\n|arrow=6, 4"))
+                        ui += arrow;
+                    if (!goback.isEmpty())
+                        ui += goback;
+
+                    ui += "\n}}";
+
+                    ClipboardHelper.setClipboard(ui);
+
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedUi")));
+                }
             }
         }
     }
@@ -122,7 +230,8 @@ public class Listeners {
             ItemStack is = event.itemStack;
             if (is == null ||
                     !is.hasTagCompound() ||
-                    !is.getTagCompound().hasKey("ExtraAttributes"))
+                    !is.getTagCompound().hasKey("ExtraAttributes") ||
+                    !is.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id"))
                 return;
             String id = is.getTagCompound().getCompoundTag("ExtraAttributes").getString("id");
             event.toolTip.add("Skyblock ID: " + id);

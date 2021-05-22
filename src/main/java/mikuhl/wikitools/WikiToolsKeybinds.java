@@ -37,6 +37,11 @@ public class WikiToolsKeybinds {
             Keyboard.KEY_X,
             category
     );
+    public static KeyBinding COPY_WIKI_UI = new KeyBinding(
+            "wikitools.keybind.ui",
+            Keyboard.KEY_C,
+            category
+    );
 
     public static void init() {
         ClientRegistry.registerKeyBinding(RENDER);
@@ -44,5 +49,6 @@ public class WikiToolsKeybinds {
         ClientRegistry.registerKeyBinding(HUD);
         ClientRegistry.registerKeyBinding(COPY_SKULL_ID);
         ClientRegistry.registerKeyBinding(COPY_WIKI_TOOLTIP);
+        ClientRegistry.registerKeyBinding(COPY_WIKI_UI);
     }
 }
