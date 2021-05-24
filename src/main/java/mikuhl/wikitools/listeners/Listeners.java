@@ -83,9 +83,9 @@ public class Listeners {
                 ItemStack is = guiContainer.getSlotUnderMouse().getStack();
                 if (is == null)
                     return;
-                String ID = "['" + is.getDisplayName().replaceAll("\u00A7.", "") + "']";
-                String name = "name = '" + is.getDisplayName().replaceAll("\u00A7.", "") + "'";
-                String title = "title = '" + is.getDisplayName().replaceAll("\u00A7", "&") + "'";
+                String ID = "['" + sanitise(is.getDisplayName(), true) + "']";
+                String name = "name = '" + sanitise(is.getDisplayName(), true) + "'";
+                String title = "title = '" + sanitise(is.getDisplayName(), false) + "'";
                 String text = "text = '";
                 if (is.hasTagCompound() &&
                         is.getTagCompound().hasKey("display") &&
@@ -96,13 +96,12 @@ public class Listeners {
                     {
                         if (i > 0)
                             text += "/";
-                        text += lore.getStringTagAt(i).replaceAll("\u00A7", "&")
-                                .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
+                        text += sanitise(lore.getStringTagAt(i), false);
                     }
                 }
                 text += "'";
 
-                ClipboardHelper.setClipboard(ID + " = {" + name + ", " + title + ", " + text + ",},");
+                ClipboardHelper.setClipboard(ID + " = {" + name + ", " + title + ", " + text + ", },");
 
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedTooltip")));
             }
@@ -122,7 +121,8 @@ public class Listeners {
                 if (mc.thePlayer.openContainer instanceof ContainerChest)
                 {
                     ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
-                    String ui = "{{UI|" + chest.getLowerChestInventory().getName() + (shift ? "|fill=false" : "");
+                    String ui = "{{UI|" + sanitise(chest.getLowerChestInventory().getName(), true)
+                            + (shift ? "|fill=false" : "");
 
                     for (int i = 0; i < chest.getLowerChestInventory().getSizeInventory(); i++)
                     {
@@ -136,7 +136,8 @@ public class Listeners {
                             continue;
                         }
                         if (chest.getSlot(i).getStack().hasDisplayName())
-                            if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" "))
+                            if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" ")
+                                    && chest.getSlot(i).getStack().getItemDamage() == 15)
                             {
                                 if (shift)
                                     ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=Blank, none";
@@ -159,8 +160,7 @@ public class Listeners {
                                     {
                                         if (l > 0)
                                             goback += "/";
-                                        goback += lore.getStringTagAt(l).replaceAll("\u00A7", "&")
-                                                .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
+                                        goback += sanitise(lore.getStringTagAt(l), false);
                                     }
                                 }
                                 continue;
@@ -175,15 +175,14 @@ public class Listeners {
                                 && chest.getSlot(i).getStack().getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")
                                 && !chest.getLowerChestInventory().getName().contains("Collection")))
                         {
-                            ui += chest.getSlot(i).getStack().getDisplayName().replaceAll("\u00A7.", "");
+                            ui += sanitise(chest.getSlot(i).getStack().getDisplayName(), true);
                         } else
                             ui += chest.getSlot(i).getStack().getItem().getItemStackDisplayName(chest.getSlot(i).getStack());
 
                         if (chest.getSlot(i).getStack().stackSize > 1)
                             ui += "; " + chest.getSlot(i).getStack().stackSize;
 
-                        ui += ", none, " + chest.getSlot(i).getStack().getDisplayName().replaceAll("\u00A7", "&")
-                                + ",";
+                        ui += ", none, " + sanitise(chest.getSlot(i).getStack().getDisplayName(), false) + ", ";
                         if (chest.getSlot(i).getStack().hasTagCompound() &&
                                 chest.getSlot(i).getStack().getTagCompound().hasKey("display") &&
                                 chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").hasKey("Lore"))
@@ -193,8 +192,7 @@ public class Listeners {
                             {
                                 if (l > 0)
                                     ui += "/";
-                                ui += lore.getStringTagAt(l).replaceAll("\u00A7", "&")
-                                        .replaceAll("\\/", "\\\\/").replaceAll("\\,", "\\\\,");
+                                ui += sanitise(lore.getStringTagAt(l), false);
                             }
                         } else
                             ui += "none";
@@ -207,6 +205,9 @@ public class Listeners {
                     if (!goback.isEmpty())
                         ui += goback;
 
+                    if (chest.getLowerChestInventory().getSizeInventory() / 9 != 6)
+                        ui += "\n|rows=" + chest.getLowerChestInventory().getSizeInventory() / 9;
+
                     ui += "\n}}";
 
                     ClipboardHelper.setClipboard(ui);
@@ -215,6 +216,19 @@ public class Listeners {
                 }
             }
         }
+    }
+
+    public String sanitise(String text, boolean delete)
+    {
+        if (!delete)
+            text = text.replaceAll("\u00A7", "&");
+        else
+            text = text.replaceAll("\u00A7.", "");
+
+        return text.replaceAll("\\/", "\\\\/")
+                .replaceAll("\\,", "\\\\,")
+                .replaceAll("'", "\\\\'")
+                .replaceAll("\\|", "{{!}}");
     }
 
     /**
