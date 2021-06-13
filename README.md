@@ -23,3 +23,8 @@ When Advanced Tooltips are enabled, the Skyblock ID will be shown in the item's 
 * Copy Wiki Tooltip
   * **Key**: X
   * **Description**: Copy the item you are hovering over's generated Wiki Tooltip to your clipboard.
+  
+  
+* Copy Wiki UI Code
+  * **Key**: C
+  * **Description**: Copy the UI menu you have open into a Wiki UI format to your clipboard.
