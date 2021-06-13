@@ -83,9 +83,9 @@ public class Listeners {
                 ItemStack is = guiContainer.getSlotUnderMouse().getStack();
                 if (is == null)
                     return;
-                String ID = "['" + sanitise(is.getDisplayName(), true) + "']";
-                String name = "name = '" + sanitise(is.getDisplayName(), true) + "'";
-                String title = "title = '" + sanitise(is.getDisplayName(), false) + "'";
+                String ID = "['" + sanitise(is.getDisplayName(), true, false) + "']";
+                String name = "name = '" + sanitise(is.getDisplayName(), true, false) + "'";
+                String title = "title = '" + sanitise(is.getDisplayName(), false, false) + "'";
                 String text = "text = '";
                 if (is.hasTagCompound() &&
                         is.getTagCompound().hasKey("display") &&
@@ -96,7 +96,7 @@ public class Listeners {
                     {
                         if (i > 0)
                             text += "/";
-                        text += sanitise(lore.getStringTagAt(i), false);
+                        text += sanitise(lore.getStringTagAt(i), false, false);
                     }
                 }
                 text += "'";
@@ -121,7 +121,7 @@ public class Listeners {
                 if (mc.thePlayer.openContainer instanceof ContainerChest)
                 {
                     ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
-                    String ui = "{{UI|" + sanitise(chest.getLowerChestInventory().getName(), true)
+                    String ui = "{{UI|" + sanitise(chest.getLowerChestInventory().getName(), true, true)
                             + (shift ? "|fill=false" : "");
 
                     for (int i = 0; i < chest.getLowerChestInventory().getSizeInventory(); i++)
@@ -136,11 +136,14 @@ public class Listeners {
                             continue;
                         }
                         if (chest.getSlot(i).getStack().hasDisplayName())
-                            if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" ")
-                                    && chest.getSlot(i).getStack().getItemDamage() == 15)
+                            if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" "))
                             {
-                                if (shift)
+                                if (chest.getSlot(i).getStack().getItemDamage() == 15 && shift)
                                     ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=Blank, none";
+                                else
+                                    ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=" +
+                                            sanitise(chest.getSlot(i).getStack().getDisplayName(), true, true) +
+                                            ", none, none";
                                 continue;
                             } else if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase("\u00A7cClose"))
                             {
@@ -160,7 +163,7 @@ public class Listeners {
                                     {
                                         if (l > 0)
                                             goback += "/";
-                                        goback += sanitise(lore.getStringTagAt(l), false);
+                                        goback += sanitise(lore.getStringTagAt(l), false, true);
                                     }
                                 }
                                 continue;
@@ -175,14 +178,14 @@ public class Listeners {
                                 && chest.getSlot(i).getStack().getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")
                                 && !chest.getLowerChestInventory().getName().contains("Collection")))
                         {
-                            ui += sanitise(chest.getSlot(i).getStack().getDisplayName(), true);
+                            ui += sanitise(chest.getSlot(i).getStack().getDisplayName(), true, true);
                         } else
                             ui += chest.getSlot(i).getStack().getItem().getItemStackDisplayName(chest.getSlot(i).getStack());
 
                         if (chest.getSlot(i).getStack().stackSize > 1)
                             ui += "; " + chest.getSlot(i).getStack().stackSize;
 
-                        ui += ", none, " + sanitise(chest.getSlot(i).getStack().getDisplayName(), false) + ", ";
+                        ui += ", none, " + sanitise(chest.getSlot(i).getStack().getDisplayName(), false, true) + ", ";
                         if (chest.getSlot(i).getStack().hasTagCompound() &&
                                 chest.getSlot(i).getStack().getTagCompound().hasKey("display") &&
                                 chest.getSlot(i).getStack().getTagCompound().getCompoundTag("display").hasKey("Lore"))
@@ -192,7 +195,7 @@ public class Listeners {
                             {
                                 if (l > 0)
                                     ui += "/";
-                                ui += sanitise(lore.getStringTagAt(l), false);
+                                ui += sanitise(lore.getStringTagAt(l), false, true);
                             }
                         } else
                             ui += "none";
@@ -212,22 +215,23 @@ public class Listeners {
 
                     ClipboardHelper.setClipboard(ui);
 
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedUi")));
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedUI")));
                 }
             }
         }
     }
 
-    public String sanitise(String text, boolean delete)
+    public String sanitise(String text, boolean delete, boolean ui)
     {
         if (!delete)
             text = text.replaceAll("\u00A7", "&");
         else
             text = text.replaceAll("\u00A7.", "");
+        if (!ui)
+            text = text.replaceAll("'", "\\\\'");
 
-        return text.replaceAll("\\/", "\\\\/")
+        return text.replaceAll("\\/", "\\\\\\\\/")
                 .replaceAll("\\,", "\\\\,")
-                .replaceAll("'", "\\\\'")
                 .replaceAll("\\|", "{{!}}");
     }
 
