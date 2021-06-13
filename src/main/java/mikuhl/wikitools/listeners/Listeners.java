@@ -13,16 +13,16 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -310,4 +310,18 @@ public class Listeners {
             }
         }
     }
+
+    @SubscribeEvent
+    public void onEntityJoinWorld(EntityJoinWorldEvent event)
+    {
+        if (event.entity == Minecraft.getMinecraft().thePlayer && !WikiTools.getInstance().updateMessage.isEmpty())
+        {
+            IChatComponent ichatcomponent = new ChatComponentText(WikiTools.getInstance().updateMessage);
+            ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Charzard4261/wikitools/releases/latest"));
+            ichatcomponent.getChatStyle().setUnderlined(true);
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
+            WikiTools.getInstance().updateMessage = "";
+        }
+    }
+
 }
