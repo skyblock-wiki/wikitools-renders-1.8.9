@@ -2,6 +2,7 @@ package mikuhl.wikitools;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import mikuhl.wikitools.entity.EntityRenderClone;
 import mikuhl.wikitools.helper.FramebufferHelper;
 import mikuhl.wikitools.listeners.Listeners;
 import mikuhl.wikitools.proxy.CommonProxy;
@@ -28,14 +29,14 @@ import static jdk.nashorn.internal.objects.Global.Infinity;
 @Mod(modid = WikiTools.MODID, version = WikiTools.VERSION)
 public class WikiTools {
     public static final String MODID   = "wikitools";
-    public static final String VERSION = "2.5";
+    public static final String VERSION = "2.6";
 
     private static WikiTools        instance;
     public         WikiToolsConfigs configs;
 
-    public Listeners        listeners;
-    public EntityLivingBase entity        = null;
-    public String           updateMessage = "";
+    public  Listeners        listeners;
+    private EntityLivingBase entity        = null;
+    public  String           updateMessage = "";
 
     public WikiTools()
     {
@@ -98,6 +99,8 @@ public class WikiTools {
 
     public EntityLivingBase getEntity()
     {
+        if (entity == null)
+            setEntity(new EntityRenderClone(Minecraft.getMinecraft().thePlayer, false));
         return entity;
     }
 

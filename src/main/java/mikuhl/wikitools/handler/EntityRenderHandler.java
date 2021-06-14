@@ -28,7 +28,7 @@ public class EntityRenderHandler {
             return;
         }
 
-        if (!WikiToolsKeybinds.RENDER.isKeyDown()) return;
+        if (!WikiToolsKeybinds.COPY_ENTITY.isKeyDown()) return;
 
         if (rendering) return;
 

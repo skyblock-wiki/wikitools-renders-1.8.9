@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import mikuhl.wikitools.WikiTools;
 import mikuhl.wikitools.WikiToolsKeybinds;
-import mikuhl.wikitools.entity.EntityRenderClone;
 import mikuhl.wikitools.gui.WTGuiScreen;
 import mikuhl.wikitools.helper.ClipboardHelper;
 import net.minecraft.block.BlockSkull;
@@ -15,12 +14,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.inventory.ContainerChest;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -36,11 +40,7 @@ public class Listeners {
     public void onRender(TickEvent.RenderTickEvent e)
     {
         if (openUI)
-        {
-            if (WikiTools.getInstance().getEntity() == null)
-                WikiTools.getInstance().setEntity(new EntityRenderClone(Minecraft.getMinecraft().thePlayer, false));
             Minecraft.getMinecraft().displayGuiScreen(new WTGuiScreen());
-        }
         openUI = false;
     }
 
@@ -217,6 +217,29 @@ public class Listeners {
 
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedUI")));
                 }
+            }
+        } else if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_ENTITY.getKeyCode()))
+        {
+            if (event.gui instanceof GuiContainer)
+            {
+                boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+
+                GuiContainer guiContainer = (GuiContainer) event.gui;
+                if (guiContainer.getSlotUnderMouse() == null)
+                    return;
+
+                ItemStack is = guiContainer.getSlotUnderMouse().getStack();
+                if (is == null)
+                    return;
+
+                if (shift && (is.getItem() instanceof ItemBlock || is.getItem() instanceof ItemSkull))
+                    WikiTools.getInstance().getEntity().replaceItemInInventory(103, is);
+                else if (is.getItem() instanceof ItemArmor)
+                    WikiTools.getInstance().getEntity().replaceItemInInventory(100 + (3 - ((ItemArmor) is.getItem()).armorType), is);
+                else
+                    WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, is);
+
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.addedItem")));
             }
         }
     }

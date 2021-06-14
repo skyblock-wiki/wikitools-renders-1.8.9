@@ -70,7 +70,7 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 4 - 54) / 2,
                 100, 20,
                 I18n.format("wikitools.gui.removeItem"));
-        remove_item.enabled = false;
+        //remove_item.enabled = false;
         buttonList.add(remove_item);
 
         GuiSlider headPitch = new GuiSlider(this, 4266,
@@ -118,10 +118,13 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 anchorX - (width - offset - 20) / 2 + 125, anchorY + (height - offset - 20) / 2, 0xFF000000);
 
         // Gotta call this or skin is completely black
-        FramebufferHelper.drawEntityOnScreen(0, 0, 0, WikiTools.getInstance().entity);
+        FramebufferHelper.drawEntityOnScreen(0, 0, 0, WikiTools.getInstance().getEntity());
         // Check if holding item, if so, move to the right a bit
-        FramebufferHelper.drawEntityOnScreen(anchorX - (width - offset - 20 - 124) / 2, anchorY + (height - offset - 64) / 2, 90, WikiTools.getInstance().entity);
+        FramebufferHelper.drawEntityOnScreen(anchorX - (width - offset - 20 - 124) / 2, anchorY + (height - offset - 64) / 2, 90, WikiTools.getInstance().getEntity());
 
+        // Hacky method so that Ghasts don't just cover over UI buttons
+        // For some reason you can't copy Ender Dragons so it applies for Ghasts
+        // Should probably check for Giants?
         if (WikiTools.getInstance().getEntity() instanceof EntityGhast)
         {
             zLevel = 300;
@@ -291,7 +294,8 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
         } else if (button.id == 4263) // Remove Enchants
         {
             for (ItemStack itemStack : WikiTools.getInstance().getEntity().getInventory())
-                if (itemStack != null && itemStack.hasTagCompound()) itemStack.getTagCompound().removeTag("ench");
+                if (itemStack != null && itemStack.hasTagCompound())
+                    itemStack.getTagCompound().removeTag("ench");
 
             if (WikiTools.getInstance().getEntity().getHeldItem() != null && WikiTools.getInstance().getEntity().getHeldItem().hasTagCompound())
                 WikiTools.getInstance().getEntity().getHeldItem().getTagCompound().removeTag("ench");
@@ -299,17 +303,21 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
         {
             try
             {
-                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, null);
-                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(1, null);
-                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(2, null);
-                WikiTools.getInstance().getEntity().setCurrentItemOrArmor(3, null);
+                WikiTools.getInstance().getEntity().replaceItemInInventory(100, null);
+                WikiTools.getInstance().getEntity().replaceItemInInventory(101, null);
+                WikiTools.getInstance().getEntity().replaceItemInInventory(102, null);
+                WikiTools.getInstance().getEntity().replaceItemInInventory(103, null);
             } catch (Exception e)
             {
                 System.out.println(e);
             }
         } else if (button.id == 4265) // Remove Held Item
         {
-            WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, null);
+            if (WikiTools.getInstance().getEntity() instanceof AbstractClientPlayer)
+                for (int i = 0; i < 9; i++)
+                    WikiTools.getInstance().getEntity().replaceItemInInventory(0, null);
+            else
+                WikiTools.getInstance().getEntity().replaceItemInInventory(99, null);
         }
     }
 

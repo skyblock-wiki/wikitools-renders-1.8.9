@@ -2,6 +2,8 @@
 Minecraft mod to copy NBT, render entities and other things.
 When Advanced Tooltips are enabled, the Skyblock ID will be shown in the item's tooltip.
 
+To add items to the Copied Entity, press the Copy Entity key when hovering over an item. Armours will automatically go onto the entity, and holding shift when over a block will put it on its head.
+
 ## Keybinds
 
 * Copy Entity

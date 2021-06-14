@@ -1,7 +1,7 @@
 mikuhl.wikitool.category=Wikitools
 mikuhl.wikitool.copy.nbt.description=Copy NBT
-mikuhl.wikitool.render.description=Copy Entity
 wikitools.needsUpdating=Wikitools has an update:
+wikitools.keybind.copyEntity=Copy Entity
 wikitools.keybind.hud=Open GUI
 wikitools.keybind.skullID=Copy Skull ID
 wikitools.keybind.tooltip=Copy Wiki Tooltip
@@ -11,6 +11,7 @@ wikitools.message.copiedSkullID=Wikitools: Copied Skull ID:
 wikitools.message.copiedTooltip=Wikitools: Copied Tooltip
 wikitools.message.copiedUI=Wikitools: Copied UI
 wikitools.message.copiedNBT=Wikitools: Copied NBT
+wikitools.message.addedItem=Wikitools: Added Item to Copied Entity
 wikitools.gui.setSteve=Set to Steve
 wikitools.gui.toggleInvisible=Toggle Invisible
 wikitools.gui.removeEnchants=Remove Enchants
