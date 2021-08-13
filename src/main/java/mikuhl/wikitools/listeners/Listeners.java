@@ -4,10 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import mikuhl.wikitools.WikiTools;
 import mikuhl.wikitools.WikiToolsKeybinds;
+import mikuhl.wikitools.entity.RenderPlayerOverride;
 import mikuhl.wikitools.gui.WTGuiScreen;
 import mikuhl.wikitools.helper.ClipboardHelper;
 import net.minecraft.block.BlockSkull;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -26,6 +28,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -344,6 +347,19 @@ public class Listeners {
             ichatcomponent.getChatStyle().setUnderlined(true);
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
             WikiTools.getInstance().updateMessage = "";
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderLiving(RenderPlayerEvent.Pre event)
+    {
+        if (event.entity == WikiTools.getInstance().getEntity()
+                && WikiTools.getInstance().getEntity() instanceof AbstractClientPlayer
+                && !(event.renderer instanceof RenderPlayerOverride))
+        {
+            event.setCanceled(true);
+            RenderPlayerOverride re = new RenderPlayerOverride(Minecraft.getMinecraft().getRenderManager(), WikiTools.getInstance().configs.smallArms);
+            re.doRender((AbstractClientPlayer) event.entity, event.x, event.y, event.z, WikiTools.getInstance().configs.bodyYaw, 0);
         }
     }
 

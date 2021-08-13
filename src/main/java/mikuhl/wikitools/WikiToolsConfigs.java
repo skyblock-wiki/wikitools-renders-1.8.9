@@ -8,4 +8,5 @@ public class WikiToolsConfigs {
     public float headYaw   = 0.0f;
     public float bodyYaw   = 0.0f;
 
+    public boolean smallArms = false;
 }

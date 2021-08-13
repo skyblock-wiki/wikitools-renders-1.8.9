@@ -82,6 +82,13 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 6 - 54) / 2,
                 I18n.format("wikitools.gui.headYaw"), -90.0f, 90.0f, 0.0f, this);
         buttonList.add(headYaw);
+
+
+        WTGuiButton toggle_small_arms = new WTGuiButton(4268,
+                anchorX - (width - offset - 14 - 10 - (256 * 2)) / 2, anchorY - (height - offset - 14 - 54) / 2,
+                100, 20,
+                I18n.format("wikitools.gui.toggleSmallArms"));
+        buttonList.add(toggle_small_arms);
     }
 
     @Override
@@ -318,6 +325,9 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                     WikiTools.getInstance().getEntity().replaceItemInInventory(0, null);
             else
                 WikiTools.getInstance().getEntity().replaceItemInInventory(99, null);
+        } else if (button.id == 4268)
+        {
+            WikiTools.getInstance().configs.smallArms = !WikiTools.getInstance().configs.smallArms;
         }
     }
 

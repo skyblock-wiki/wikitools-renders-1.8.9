@@ -7,20 +7,26 @@ import mikuhl.wikitools.helper.FramebufferHelper;
 import mikuhl.wikitools.listeners.Listeners;
 import mikuhl.wikitools.proxy.CommonProxy;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -29,7 +35,7 @@ import static jdk.nashorn.internal.objects.Global.Infinity;
 @Mod(modid = WikiTools.MODID, version = WikiTools.VERSION)
 public class WikiTools {
     public static final String MODID   = "wikitools";
-    public static final String VERSION = "2.6";
+    public static final String VERSION = "2.6.1";
 
     private static WikiTools        instance;
     public         WikiToolsConfigs configs;
@@ -104,6 +110,9 @@ public class WikiTools {
         return entity;
     }
 
+    private int              customSkinCounter = 0;
+    public  ResourceLocation currentCustomSkin;
+
     public void setEntity(EntityLivingBase entity)
     {
         this.entity = entity;
@@ -122,8 +131,43 @@ public class WikiTools {
         entity.rotationYaw = 0;
         // Head rotation pitch
         entity.rotationPitch = configs.headPitch;
+        entity.prevRotationPitch = configs.headPitch;
         entity.rotationYawHead = configs.bodyYaw + configs.headYaw;
         entity.prevRotationYawHead = configs.bodyYaw + configs.headYaw;
+
+        if (entity instanceof AbstractClientPlayer)
+        {
+            if (((AbstractClientPlayer) entity).getSkinType().equalsIgnoreCase("slim"))
+                WikiTools.getInstance().configs.smallArms = true;
+            else
+                WikiTools.getInstance().configs.smallArms = false;
+
+            if (((AbstractClientPlayer) entity).hasSkin())
+            {
+                ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
+                ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
+                BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
+
+                Graphics2D G2D = bufferedImage.createGraphics();
+
+                for (int x = 0; x < bufferedImage.getWidth(); x++)
+                    for (int y = 0; y < bufferedImage.getHeight(); y++)
+                    {
+                        Color c = new Color(bufferedImage.getRGB(x, y), true);
+                        if (0 < c.getAlpha() && c.getAlpha() < 255)
+                        {
+                            Color corrected = new Color(c.getRed(), c.getGreen(), c.getBlue(), 255);
+                            G2D.setColor(corrected);
+                            G2D.fill(new Rectangle(x, y, 1, 1));
+                        }
+                    }
+                G2D.dispose();
+
+                DynamicTexture dynTex = new DynamicTexture(bufferedImage);
+                currentCustomSkin = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("WikiToolsCustomSkin_" + customSkinCounter, dynTex);
+                customSkinCounter++;
+            }
+        }
     }
 
     boolean rendering = false;

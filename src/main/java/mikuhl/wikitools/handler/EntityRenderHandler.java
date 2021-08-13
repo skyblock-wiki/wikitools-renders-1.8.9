@@ -35,6 +35,7 @@ public class EntityRenderHandler {
         Minecraft minecraft = Minecraft.getMinecraft();
 
         MovingObjectPosition objectMouseOver = minecraft.objectMouseOver;
+        if (objectMouseOver == null || objectMouseOver.entityHit == null) return;
         Entity entityHit = objectMouseOver.entityHit;
 
         // Get the right entity

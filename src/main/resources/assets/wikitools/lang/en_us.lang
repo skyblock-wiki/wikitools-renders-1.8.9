@@ -19,3 +19,4 @@ wikitools.gui.removeArmour=Remove Armour
 wikitools.gui.removeItem=Remove Item
 wikitools.gui.headPitch=Head Pitch
 wikitools.gui.headYaw=Head Yaw
+wikitools.gui.toggleSmallArms=Toggle Small Arms
