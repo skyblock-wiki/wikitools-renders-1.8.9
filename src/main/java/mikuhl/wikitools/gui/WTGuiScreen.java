@@ -83,7 +83,6 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
                 I18n.format("wikitools.gui.headYaw"), -90.0f, 90.0f, 0.0f, this);
         buttonList.add(headYaw);
 
-
         WTGuiButton toggle_small_arms = new WTGuiButton(4268,
                 anchorX - (width - offset - 14 - 10 - (256 * 2)) / 2, anchorY - (height - offset - 14 - 54) / 2,
                 100, 20,

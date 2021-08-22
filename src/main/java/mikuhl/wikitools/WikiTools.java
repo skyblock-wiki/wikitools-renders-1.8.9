@@ -11,6 +11,7 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,7 +36,7 @@ import static jdk.nashorn.internal.objects.Global.Infinity;
 @Mod(modid = WikiTools.MODID, version = WikiTools.VERSION)
 public class WikiTools {
     public static final String MODID   = "wikitools";
-    public static final String VERSION = "2.6.1";
+    public static final String VERSION = "2.6.2";
 
     private static WikiTools        instance;
     public         WikiToolsConfigs configs;
@@ -138,13 +139,13 @@ public class WikiTools {
         if (entity instanceof AbstractClientPlayer)
         {
             if (((AbstractClientPlayer) entity).getSkinType().equalsIgnoreCase("slim"))
-                WikiTools.getInstance().configs.smallArms = true;
+                configs.smallArms = true;
             else
-                WikiTools.getInstance().configs.smallArms = false;
+                configs.smallArms = false;
 
-            if (((AbstractClientPlayer) entity).hasSkin())
+            if (((AbstractClientPlayer) entity).hasSkin() || !DefaultPlayerSkin.getDefaultSkin(entity.getUniqueID()).equals(((AbstractClientPlayer) entity).getLocationSkin()))
             {
-                ResourceLocation rl = ((AbstractClientPlayer) WikiTools.getInstance().getEntity()).getLocationSkin();
+                ResourceLocation rl = ((AbstractClientPlayer) entity).getLocationSkin();
                 ThreadDownloadImageData dat = (ThreadDownloadImageData) Minecraft.getMinecraft().getTextureManager().getTexture(rl);
                 BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, dat, "bufferedImage", "field_110560_d");
 
@@ -166,7 +167,8 @@ public class WikiTools {
                 DynamicTexture dynTex = new DynamicTexture(bufferedImage);
                 currentCustomSkin = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation("WikiToolsCustomSkin_" + customSkinCounter, dynTex);
                 customSkinCounter++;
-            }
+            } else
+                currentCustomSkin = DefaultPlayerSkin.getDefaultSkin(entity.getUniqueID());
         }
     }
 
