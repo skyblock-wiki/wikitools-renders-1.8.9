@@ -107,17 +107,23 @@ public class WTGuiScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
 
         // Draw Outer Trim
         drawRect(anchorX - width / 2, anchorY - height / 2,
-                anchorX + width / 2, anchorY + height / 2, 0x9933187E);
-        // Draw Trim
-        drawRect(anchorX - (width - offset) / 2 - 1, anchorY - (height - offset) / 2 - 1,
-                anchorX + (width - offset) / 2 + 1, anchorY + (height - offset) / 2 + 1, 0xFF7110CC);
+                anchorX + width / 2, anchorY + height / 2, 0xFF000000);
+        // Draw Corners
+        drawRect(anchorX - (width - offset) / 2 - 2, anchorY - (height - offset) / 2 - 2,
+                anchorX + (width - offset) / 2 + 2, anchorY + (height - offset) / 2 + 2, 0xFF8B8B8B);
+        // Draw T+L Trim
+        drawRect(anchorX - (width - offset) / 2 - 2, anchorY - (height - offset) / 2 - 2,
+                anchorX + (width - offset) / 2, anchorY + (height - offset) / 2, 0xFFFFFFFF);
+        // Draw B+R Trim
+        drawRect(anchorX - (width - offset) / 2, anchorY - (height - offset) / 2,
+                anchorX + (width - offset) / 2 + 2, anchorY + (height - offset) / 2 + 2, 0xFF555555);
         // Draw Main Panel
         drawRect(anchorX - (width - offset) / 2, anchorY - (height - offset) / 2,
-                anchorX + (width - offset) / 2, anchorY + (height - offset) / 2, 0xFF33187E);
+                anchorX + (width - offset) / 2, anchorY + (height - offset) / 2, 0xFFC6C6C6);
         // Draw Nameplate
         drawRect(anchorX - (width - offset - 14) / 2, anchorY - (height - offset - 14) / 2,
-                anchorX + (-width + offset + 16 + 260) / 2, anchorY + (-height + offset + 14 + 30) / 2, 0xFF542DAF);
-        drawCenteredString(mc.fontRendererObj, "Wikitools", anchorX - (width - offset - 14 - 130) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFF7053B2);
+                anchorX + (-width + offset + 16 + 260) / 2, anchorY + (-height + offset + 14 + 30) / 2, 0xFF6D6D6D);
+        drawCenteredString(mc.fontRendererObj, "Wikitools", anchorX - (width - offset - 14 - 130) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFFE0E0E0);
 
         // Draw Entity Box
         drawRect(anchorX - (width - offset - 20) / 2, anchorY - (height - offset - 20) / 2 + 24,

@@ -53,7 +53,7 @@ public class Listeners {
         if (!Keyboard.getEventKeyState())
             return;
 
-        if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_SKULL_ID.getKeyCode()))
+        if (WikiToolsKeybinds.COPY_SKULL_ID.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_SKULL_ID.getKeyCode()))
         {
             if (event.gui instanceof GuiContainer)
             {
@@ -75,7 +75,7 @@ public class Listeners {
 
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedSkullID") + " " + skullID));
             }
-        } else if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_TOOLTIP.getKeyCode()))
+        } else if (WikiToolsKeybinds.COPY_WIKI_TOOLTIP.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_TOOLTIP.getKeyCode()))
         {
             if (event.gui instanceof GuiContainer)
             {
@@ -108,7 +108,7 @@ public class Listeners {
 
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedTooltip")));
             }
-        } else if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode()))
+        } else if (WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode()))
         {
             boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
             boolean sprint = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSprint.getKeyCode());
@@ -221,7 +221,7 @@ public class Listeners {
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedUI")));
                 }
             }
-        } else if (Keyboard.isKeyDown(WikiToolsKeybinds.COPY_ENTITY.getKeyCode()))
+        } else if (WikiToolsKeybinds.COPY_ENTITY.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_ENTITY.getKeyCode()))
         {
             if (event.gui instanceof GuiContainer)
             {
