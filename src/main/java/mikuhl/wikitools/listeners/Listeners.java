@@ -110,6 +110,7 @@ public class Listeners {
             }
         } else if (WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode()))
         {
+            // Used for "No-Fill" Mode
             boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
             boolean sprint = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSprint.getKeyCode());
 
@@ -132,18 +133,23 @@ public class Listeners {
                         if (i % 9 == 0 && i != 0)
                             ui += "\n|-";
 
+                        // If the current slot is empty
                         if (!chest.getSlot(i).getHasStack())
                         {
                             if (!shift)
                                 ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "= , none";
                             continue;
                         }
+
+                        // Custom UI Items
                         if (chest.getSlot(i).getStack().hasDisplayName())
                             if (chest.getSlot(i).getStack().getDisplayName().equalsIgnoreCase(" "))
                             {
-                                if (chest.getSlot(i).getStack().getItemDamage() == 15 && shift)
-                                    ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=Blank, none";
-                                else
+                                if (chest.getSlot(i).getStack().getItemDamage() == 15)
+                                {
+                                    if (shift)
+                                        ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=Blank, none";
+                                } else
                                     ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=" +
                                             sanitise(chest.getSlot(i).getStack().getDisplayName(), true, true) +
                                             ", none, none";
@@ -172,6 +178,7 @@ public class Listeners {
                                 continue;
                             }
 
+                        // |Row, Column= with top left being 1, 1
                         ui += "\n|" + ((i / 9) + 1) + ", " + ((i % 9) + 1) + "=";
 
                         if (chest.getSlot(i).getStack().getItem() instanceof ItemSkull
@@ -249,6 +256,9 @@ public class Listeners {
 
     public String sanitise(String text, boolean delete, boolean ui)
     {
+        text = text.replaceAll("&", (ui? "" : "\\\\") + "\\\\&");
+
+        // If not delete, replace all colour codes (§) with &
         if (!delete)
             text = text.replaceAll("\u00A7", "&");
         else
