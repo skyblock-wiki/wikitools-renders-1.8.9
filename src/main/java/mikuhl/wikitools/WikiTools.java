@@ -36,7 +36,7 @@ import static jdk.nashorn.internal.objects.Global.Infinity;
 @Mod(modid = WikiTools.MODID, version = WikiTools.VERSION)
 public class WikiTools {
     public static final String MODID   = "wikitools";
-    public static final String VERSION = "2.6.3";
+    public static final String VERSION = "2.6.4";
 
     private static WikiTools        instance;
     public         WikiToolsConfigs configs;
