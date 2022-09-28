@@ -1,4 +1,4 @@
-# wikitools
+# WikiTools
 Minecraft mod to copy NBT, render entities and other things.
 When Advanced Tooltips are enabled, the Skyblock ID will be shown in the item's tooltip.
 
@@ -8,7 +8,8 @@ To add items to the Copied Entity, press the Copy Entity key when hovering over 
 
 * Copy Entity
   * **Key**: M
-  * **Description**: Copies the entity you are looking at to memory.
+  * **Description**: Copies the entity you are looking at to memory as held item.
+  * **Holding Shift**: Copy the entity as head instead.
   
 * Open UI
   * **Key**: K
@@ -21,12 +22,14 @@ To add items to the Copied Entity, press the Copy Entity key when hovering over 
 * Copy Skull ID
   * **Key**: Z
   * **Description**: Copy a Skull's Texture ID (That links to http://textures.minecraft.net/texture/<ID>) to your clipboard. Works on placed Skulls,  Entities wearing skulls (excluding Players), and Skull items you are hovering over.
-  
+
 * Copy Wiki Tooltip
   * **Key**: X
-  * **Description**: Copy the item you are hovering over's generated Wiki Tooltip to your clipboard.
-  
-  
+  * **Description**: Copy the item you are hovering over as Wiki Inventory Slot Tooltip to your clipboard.
+  * **Holding Shift**: Copies tooltip as module code instead.
+
 * Copy Wiki UI Code
   * **Key**: C
   * **Description**: Copy the UI menu you have open into a Wiki UI format to your clipboard.
+  * **Holding Shift**: Enables "Filled Mode". This mode fills UI with the blank Black Stained Glass Pane by default.
+  * **Holding Ctrl**: Copies items in vanilla items instead of using the item name.
