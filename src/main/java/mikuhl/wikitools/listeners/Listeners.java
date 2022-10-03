@@ -33,6 +33,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.codec.binary.Base64;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
+
 public class Listeners {
     public boolean openUI = false;
     // colors used on wiki
@@ -53,6 +55,13 @@ public class Listeners {
         "Green",
         "Red",
         "Black"
+    };
+    private final String[] skullNames = {
+        "Skeleton Skull",
+        "Wither Skeleton Skull",
+        "Zombie Head",
+        "Player Head",
+        "Creeper Head"
     };
 
     @SubscribeEvent()
@@ -94,6 +103,9 @@ public class Listeners {
         if (!Keyboard.getEventKeyState() || !(WikiToolsKeybinds.COPY_WIKI_TOOLTIP.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_TOOLTIP.getKeyCode())))
             return;
 
+        // Used for "copy for module" mode
+        boolean copyformodule = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+
         if (event.gui instanceof GuiContainer) {
             GuiContainer guiContainer = (GuiContainer) event.gui;
             if (guiContainer.getSlotUnderMouse() == null)
@@ -102,25 +114,28 @@ public class Listeners {
             ItemStack is = guiContainer.getSlotUnderMouse().getStack();
             if (is == null)
                 return;
-            String ID = "['" + sanitiseAll(is.getDisplayName(), true, false) + "']";
-            String name = "name = '" + sanitiseAll(is.getDisplayName(), true, false) + "'";
-            String title = "title = '" + sanitiseAll(is.getDisplayName(), false, false) + "'";
-            String text = "text = '";
-            if (is.hasTagCompound() &&
-                    is.getTagCompound().hasKey("display") &&
-                    is.getTagCompound().getCompoundTag("display").hasKey("Lore")) {
-                NBTTagList lore = is.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
-                for (int i = 0; i < lore.tagCount(); i++) {
-                    if (i > 0)
-                        text += "/";
-                    text += sanitiseAll(lore.getStringTagAt(i), false, false);
-                }
+            String ID = sanitiseAll(is.getDisplayName(), true, !copyformodule);
+            String name = sanitiseAll(is.getDisplayName(), true, !copyformodule);
+            String title = sanitiseAll(is.getDisplayName(), false, !copyformodule);
+            String text = getLore(is, "/", false, !copyformodule);
+
+            if (copyformodule) {
+                ClipboardHelper.setClipboard("['" + ID + "'] = { " +
+                    "name = '" + name + "', " +
+                    "title = '" + title + "', " +
+                    (!text.equals("") ? "text = '" + text + "', " : "") +
+                    "},");
             }
-            text += "'";
+            else {
+                ClipboardHelper.setClipboard("{{Slot" +
+                    "|" + name +
+                    "|title=" + title +
+                    (!text.equals("") ? "|text=" + text : "") +
+                    "}}");
+            }
 
-            ClipboardHelper.setClipboard(ID + " = {" + name + ", " + title + ", " + text + ", },");
-
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.copiedTooltip")));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(
+                    I18n.format(copyformodule ? "wikitools.message.copiedTooltipCode" : "wikitools.message.copiedTooltip")));
         }
     }
 
@@ -129,37 +144,36 @@ public class Listeners {
         if (!Keyboard.getEventKeyState() || !(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode() >= 0 && Keyboard.isKeyDown(WikiToolsKeybinds.COPY_WIKI_UI.getKeyCode())))
             return;
 
-        // Used for "No-Fill" Mode
-        boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
-        // Used for "use Minecraft item name if not skull" Mode
-        boolean sprint = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSprint.getKeyCode());
+        // Used for "filled" mode
+        boolean filled = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+        // Used for "use Minecraft item name if not skull" mode
+        boolean forcevanilla = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSprint.getKeyCode());
 
         if (event.gui instanceof GuiContainer) {
             Minecraft mc = Minecraft.getMinecraft();
 
             if (mc.thePlayer.openContainer instanceof ContainerChest) {
                 ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
-                String close = "\n|close=none";
-                String arrow = "\n|arrow=none";
-                String goback = "";
-                String ui = "{{UI|" + sanitiseColors(chest.getLowerChestInventory().getName(), true)
-                        + (shift ? "|fill=false" : "");
+                ArrayList<String> lines = new ArrayList<String>();
+                int size = chest.getLowerChestInventory().getSizeInventory();
+                int rowsize = size / 9;
+                String close = "", arrow = "", goback = "";
+                lines.add("{{UI|" + sanitiseColors(chest.getLowerChestInventory().getName(), true)
+                        + (!filled ? "|fill=false" : ""));
 
-                for (int i = 0; i < chest.getLowerChestInventory().getSizeInventory(); i++) {
-                    if (i % 9 == 0 && i != 0)
-                        ui += "\n|-";
-
+                for (int i = 0; i < size; i++) {
                     // |Row, Column= with top left being 1, 1
-                    // Note: a future (planned) implementation of this function will require array[cellX][cellY] = line
                     int cellX = (i / 9) + 1, cellY = (i % 9) + 1;
                     String cellpos = cellX + ", " + cellY;
-                    String line = "";
+                    String item, title, text;
+                    int count = 0;
+                    boolean ench = false;
 
                     // If the current slot is empty
                     if (!chest.getSlot(i).getHasStack()) {
-                        if (!shift)
-                            line += "\n|" + cellpos + "= , none";
-                        ui += line; continue;
+                        if (filled)
+                            lines.add("|" + cellpos + "= , none");
+                        continue;
                     }
 
                     // Extract to variables
@@ -168,98 +182,80 @@ public class Listeners {
                     // Handle Custom UI Items
                     if (stack.hasDisplayName())
                         if (stack.getUnlocalizedName().contains("tile.thinStainedGlass")
-                            && stack.getDisplayName().equalsIgnoreCase(" ")) {
+                                && stack.getDisplayName().equalsIgnoreCase(" ")) {
                             // handle border glass panes
                             String color = glassPaneColors[stack.getItemDamage()];
                             if (!color.equals("Black"))
-                                line += "\n|" + cellpos + "=Blank (" + color + "), none";
-                            else if (shift)
-                                line += "\n|" + cellpos + "=Blank, none";
-                            ui += line; continue;
+                                lines.add("|" + cellpos + "=Blank (" + color + "), none");
+                            else if (!filled)
+                                lines.add("|" + cellpos + "=Blank, none");
+                            continue;
                         } else if (stack.getDisplayName().equalsIgnoreCase("\u00A7cClose")) {
-                            close = "\n|close=" + cellpos;
-                            ui += line; continue;
+                            close = cellpos;
+                            continue;
                         } else if (stack.getUnlocalizedName().equalsIgnoreCase("item.arrow")
                                 && stack.getDisplayName().contains("Back")) {
-                            arrow = "\n|arrow=" + cellpos;
-                            if (stack.hasTagCompound() &&
-                                    stack.getTagCompound().hasKey("display") &&
-                                    stack.getTagCompound().getCompoundTag("display").hasKey("Lore")) {
-                                goback = "\n|goback=";
-                                NBTTagList lore = stack.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
-                                for (int l = 0; l < lore.tagCount(); l++) {
-                                    if (l > 0)
-                                        goback += "/";
-                                    goback += sanitiseAll(lore.getStringTagAt(l), false, true);
-                                }
-                            }
-                            ui += line; continue;
+                            arrow = cellpos;
+                            goback = getLore(stack, "/", false, true);
+                            continue;
                         }
 
                     // Handle Other UI Items
-                    line += "\n|" + cellpos + "=";
-
                     // parse item name
-                    if (stack.getItem() instanceof ItemSkull
-                            || (!sprint
-                            && stack.hasTagCompound()
-                            && stack.getTagCompound().hasKey("ExtraAttributes")
-                            && stack.getTagCompound().getCompoundTag("ExtraAttributes").hasKey("id")
-                            /* && !chest.getLowerChestInventory().getName().contains("Collection") */)) {
-                        // normally, use displayed name
-                        line += sanitiseCommas(sanitiseColors(stack.getDisplayName(), true));
-                    } else {
+                    if (!forcevanilla) {
+                        // if CTRL is not held, immediately use displayed name
+                        item = sanitiseColors(stack.getDisplayName(), true);
+                    }
+                    else if (stack.getItem() instanceof ItemSkull) {
+                        if (stack.hasTagCompound() &&
+                                stack.getTagCompound().hasKey("SkullOwner")) {
+                            // if item is a custom skull, use displayed name
+                            item = sanitiseColors(stack.getDisplayName(), true);
+                        }
+                        else {
+                            // if held CTRL and item is a vanilla skull, get vanilla skull name
+                            item = skullNames[stack.getItemDamage()];
+                        }
+                    }
+                    else {
                         // if held CTRL and item is not a skull, use Minecraft item name
-                        boolean ench = false;
-                        if (stack.hasTagCompound()
-                            && stack.getTagCompound().hasKey("tag")
-                            && stack.getTagCompound().getCompoundTag("tag").hasKey("ench"))
-                            ench = true;
-                        line += (ench ? "Enchanted " : "") + stack.getItem().getItemStackDisplayName(stack);
+                        item = stack.getItem().getItemStackDisplayName(stack);
+                        if (stack.hasTagCompound()) {
+                            ench = stack.getTagCompound().hasKey("ench");
+                        }
                     }
 
                     // parse stack size
                     if (stack.stackSize > 1)
-                        line += "; " + stack.stackSize;
+                        count = stack.stackSize;
 
                     // parse lore title
-                    line += ", none, " + sanitiseAll(stack.getDisplayName(), false, true) + ", ";
+                    title = sanitiseAll(stack.getDisplayName(), false, true);
 
                     // parse lore text
-                    if (stack.hasTagCompound() &&
-                            stack.getTagCompound().hasKey("display") &&
-                            stack.getTagCompound().getCompoundTag("display").hasKey("Lore")) {
-                        NBTTagList lore = stack.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
-                        for (int l = 0; l < lore.tagCount(); l++) {
-                            if (l > 0)
-                                line += "/";
-                            line += sanitiseAll(lore.getStringTagAt(l), false, true);
-                        }
-                    } else
-                        line += "none";
+                    text = getLore(stack, "/", false, true);
 
                     // add line to ui string
-                    ui += line;
+                    lines.add(chain(cellpos, item, ench, count, title, text));
                 }
 
-                if (!close.equalsIgnoreCase("\n|close=6, 5"))
-                    ui += close;
-                if (!arrow.equalsIgnoreCase("\n|arrow=6, 4"))
-                    ui += arrow;
+                if (!close.equals("6, 5"))
+                    lines.add("|close=" + (close.equals("") ? "none" : close));
+                if (!arrow.equals("6, 4"))
+                    lines.add("|arrow=" + (arrow.equals("") ? "none" : arrow));
                 if (!goback.isEmpty())
-                    ui += goback;
+                    lines.add("|goback=" + goback);
+                if (rowsize != 6)
+                    lines.add("|rows=" + rowsize);
 
-                if (chest.getLowerChestInventory().getSizeInventory() / 9 != 6)
-                    ui += "\n|rows=" + chest.getLowerChestInventory().getSizeInventory() / 9;
+                lines.add("}}");
 
-                ui += "\n}}";
-
-                ClipboardHelper.setClipboard(ui);
+                ClipboardHelper.setClipboard(String.join("\n", lines));
 
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(
                         I18n.format("wikitools.message.copiedUI")
-                        + (shift ? " " + I18n.format("wikitools.message.UInofill") : "")
-                        + (sprint ? " " + I18n.format("wikitools.message.UImcitem") : "")
+                        + (filled ? " " + I18n.format("wikitools.message.UIfilled") : "")
+                        + (forcevanilla ? " " + I18n.format("wikitools.message.UImcitem") : "")
                 ));
             }
         }
@@ -272,7 +268,7 @@ public class Listeners {
 
         if (event.gui instanceof GuiContainer)
         {
-            boolean shift = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+            boolean copyashead = Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
 
             GuiContainer guiContainer = (GuiContainer) event.gui;
             if (guiContainer.getSlotUnderMouse() == null)
@@ -282,48 +278,69 @@ public class Listeners {
             if (is == null)
                 return;
 
-            if (shift && (is.getItem() instanceof ItemBlock || is.getItem() instanceof ItemSkull))
+            if (copyashead && (is.getItem() instanceof ItemBlock || is.getItem() instanceof ItemSkull))
+                // Copy the entity as head
                 WikiTools.getInstance().getEntity().replaceItemInInventory(103, is);
             else if (is.getItem() instanceof ItemArmor)
+                // Copy the entity as armor piece
                 WikiTools.getInstance().getEntity().replaceItemInInventory(100 + (3 - ((ItemArmor) is.getItem()).armorType), is);
             else
+                // Copy the entity as held item
                 WikiTools.getInstance().getEntity().setCurrentItemOrArmor(0, is);
 
             Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("wikitools.message.addedItem")));
         }
     }
 
-    public String sanitiseAll(String text, boolean delete, boolean ui) {
+    public String sanitiseAll(String text, boolean deleteColors, boolean ui) {
         text = text.replaceAll("\\\\", "\\\\\\\\")
                 .replaceAll("&", "\\\\&")
-                .replaceAll("\\|", "{{!}}")
                 .replaceAll("/", "\\\\/");
-        text = sanitiseColors(text, delete);
+        text = sanitiseColors(text, deleteColors);
 
-        if (!ui)
+        if (ui) {
+            // extra handlers when used in {{UI}} template context
+            text = text.replaceAll(",", "\\\\,")
+                    .replaceAll("\\|", "{{!}}")
+                    .replaceAll("=", "{{=}}");
+        }
+        else {
             // backslash handler when used in module context, e.g. for tooltip line
             // double backslash is read as single backslash in module
             text = text.replaceAll("\\\\", "\\\\\\\\");
             // then, handle single quotation marks
             text = text.replaceAll("'", "\\\\'");
-
-        if (ui)
-            // extra handlers when used in {{UI}} template context
-            text = sanitiseCommas(text);
+        }
 
         return text;
     }
-    public String sanitiseColors(String text, boolean delete) {
+    public String sanitiseColors(String text, boolean deleteColors) {
         // If not delete, replace all colour codes (§) with &
-        if (!delete)
+        if (!deleteColors)
             text = text.replaceAll("\u00A7", "&");
         else
             text = text.replaceAll("\u00A7.", "");
         return text;
     }
-    public String sanitiseCommas(String text) {
-        // this is for UI lines only
-        return text.replaceAll(",", "\\\\,");
+    public String getLore(ItemStack stack, String delimiter, boolean deleteColors, boolean ui) {
+        if (stack.hasTagCompound() &&
+                stack.getTagCompound().hasKey("display") &&
+                stack.getTagCompound().getCompoundTag("display").hasKey("Lore")) {
+            NBTTagList lore = stack.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
+            ArrayList<String> lore_lines = new ArrayList<String>();
+            for (int l = 0; l < lore.tagCount(); l++) {
+                lore_lines.add(sanitiseAll(lore.getStringTagAt(l), deleteColors, ui));
+            }
+            return String.join(delimiter, lore_lines);
+        }
+        return "";
+    }
+    public String chain(String cellpos, String item, boolean ench, int count, String title, String text) {
+        return "|" + cellpos + "=" + (ench ? "Enchanted " : "") + item
+                + (count > 1 ? "; " + count : "") + ", "
+                + "none, "
+                + (!title.equals("") ? title + ", " : "none")
+                + (!title.equals("") ? (!text.equals("") ? text : "none") : "");
     }
 
     /**
