@@ -2,13 +2,17 @@ package org.hsw.wikitoolsrenders.feature.render_entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -39,24 +43,43 @@ class EntityRenderer {
             return Optional.empty();
         }
 
-        return currentEntity.get().getCustomSkin();
+        return currentEntity.get().getPlayerAssociatedSkin();
     }
 
     private static Optional<BufferedImage> getSkinImageOfCurrentEntity() {
         Optional<ResourceLocation> skin = getSkinOfCurrentEntity();
-        IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 
         if (!skin.isPresent()) {
             return Optional.empty();
         }
 
-        try {
-            return Optional.ofNullable(TextureUtil.readBufferedImage(
-                    resourceManager.getResource(skin.get()).getInputStream()
-            ));
+        // ThreadDownloadImageData can be obtained with this method
+        {
+            TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
+
+            ITextureObject textureObject = textureManager.getTexture(skin.get());
+
+            if (textureObject instanceof  ThreadDownloadImageData) {
+                ThreadDownloadImageData imageData = (ThreadDownloadImageData) textureObject;
+                BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, imageData, "bufferedImage", "field_110560_d");
+
+                if (bufferedImage != null) {
+                    return Optional.of(bufferedImage);
+                }
+            }
         }
-        catch (IOException ignored) {
-            return Optional.empty();
+
+        // SimpleTexture, however, requires this method
+        {
+            IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+
+            try {
+                return Optional.ofNullable(TextureUtil.readBufferedImage(
+                        resourceManager.getResource(skin.get()).getInputStream()
+                ));
+            } catch (IOException ignored) {
+                return Optional.empty();
+            }
         }
     }
 

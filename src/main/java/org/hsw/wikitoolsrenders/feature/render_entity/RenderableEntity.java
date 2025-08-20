@@ -64,8 +64,14 @@ class RenderableEntity {
         return Optional.of(playerEntity);
     }
 
-    public Optional<ResourceLocation> getCustomSkin() {
-        return customSkin;
+    public Optional<ResourceLocation> getPlayerAssociatedSkin() {
+        // This function retrieves the skin of a player from the entity object.
+        // Its associated texture is ThreadDownloadImageData or SimpleTexture
+        // as opposed to this.customSkin which gives DynamicTexture or SimpleTexture.
+
+        Optional<AbstractClientPlayer> playerEntity = getAsPlayerEntity();
+
+        return playerEntity.flatMap(entity -> Optional.ofNullable(entity.getLocationSkin()));
     }
 
     private Optional<ResourceLocation> findCustomSkin() {
