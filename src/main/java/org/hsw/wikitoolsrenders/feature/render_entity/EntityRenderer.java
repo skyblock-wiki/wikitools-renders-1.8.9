@@ -127,18 +127,31 @@ class EntityRenderer {
                 return;
             }
 
-            BufferedImage icon = new BufferedImage(8, 8, BufferedImage.TYPE_INT_RGB);
-            Graphics2D G2D = icon.createGraphics();
-            G2D.drawImage(bufferedImage.get().getSubimage(8, 8, 8, 8), 0, 0, null);
-            G2D.drawImage(bufferedImage.get().getSubimage(40, 8, 8, 8), 0, 0, null);
-            G2D.dispose();
+            int sourceSize = 8;
 
-            BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = newImage.createGraphics();
-            //g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-            g.clearRect(0, 0, 64, 64);
-            g.drawImage(icon, 0, 0, 64, 64, null);
-            g.dispose();
+            // In java edition, outer layer is rendered 0.5 pixels larger than head layer (according to Minecraft wiki)
+            // And the 0.5 pixels are added to all sides (according to observation)
+            int headLayerSize = 64;
+            int outerLayerSize = (int) (headLayerSize * ((sourceSize + 0.5 * 2) / sourceSize));
+            int finalLayerSize = Math.max(headLayerSize, outerLayerSize);
+            int headLayerOffset = (outerLayerSize - headLayerSize) / 2;
+            int outerLayerOffset = 0;
+
+            BufferedImage newImage = new BufferedImage(finalLayerSize, finalLayerSize, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D newImageG2D = newImage.createGraphics();
+
+            // Fill with transparent pixels
+            newImageG2D.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+            newImageG2D.fillRect(0,0,finalLayerSize,finalLayerSize);
+
+            // Reset composite
+            newImageG2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+
+            // Draw
+            newImageG2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            newImageG2D.drawImage(bufferedImage.get().getSubimage(8, 8, sourceSize, sourceSize), headLayerOffset, headLayerOffset, headLayerSize, headLayerSize, null);
+            newImageG2D.drawImage(bufferedImage.get().getSubimage(40, 8, sourceSize, sourceSize), outerLayerOffset, outerLayerOffset, outerLayerSize, outerLayerSize, null);
+            newImageG2D.dispose();
 
             FrameBufferHelper.saveBuffer(newImage);
         });
