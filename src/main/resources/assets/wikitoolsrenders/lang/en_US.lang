@@ -1,0 +1,17 @@
+org.hsw.wikitoolsrenders.category=WikiTools Renders
+wikitoolsrenders.needsUpdating=WikiTools Renders has an update:
+wikitoolsrenders.keybind.copyEntity=Copy Entity
+wikitoolsrenders.keybind.hud=Open GUI
+wikitoolsrenders.message.copiedEntity=Copied entity
+wikitoolsrenders.gui.toggleInvisible=Toggle Invisible
+wikitoolsrenders.gui.removeEnchants=Remove Enchants
+wikitoolsrenders.gui.removeArmour=Remove Armour
+wikitoolsrenders.gui.removeItem=Remove Item
+wikitoolsrenders.gui.headPitch=Head Pitch
+wikitoolsrenders.gui.headYaw=Head Yaw
+wikitoolsrenders.gui.toggleSmallArms=Toggle Small Arms
+wikitoolsrenders.gui.setSteve=Set to Steve
+wikitoolsrenders.gui.copySelf=Copy Self
+wikitoolsrenders.gui.downloadSkin=Download Skin
+wikitoolsrenders.gui.downloadHead=Download Head
+wikitoolsrenders.gui.saveEntityImage=Save Entity Image

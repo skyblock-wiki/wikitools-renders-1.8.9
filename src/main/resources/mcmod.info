@@ -1,16 +1,19 @@
 [
-{
-  "modid": "wikitools",
-  "name": "WikiTools",
-  "description": "A mod to render images for use on Minecraft based Wikis.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["Michael Priebe","Charzard4261"],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "wikitoolsrenders",
+    "name": "WikiTools Renders",
+    "description": "A mod to render images for use on Minecraft based Wikis.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Michael Priebe",
+      "Charzard4261"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
 ]
