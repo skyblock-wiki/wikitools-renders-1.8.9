@@ -21,8 +21,6 @@ jobs:
           distribution: 'temurin'
       - name: Make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: Setup dev workspace
-        run: ./gradlew setupDevWorkspace
       - name: Execute gradle build
         run: ./gradlew build
       - name: Capture build artifacts
