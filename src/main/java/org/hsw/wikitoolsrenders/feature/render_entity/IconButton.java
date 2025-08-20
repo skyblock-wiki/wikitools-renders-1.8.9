@@ -1,5 +1,6 @@
 package org.hsw.wikitoolsrenders.feature.render_entity;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -62,6 +63,18 @@ class IconButton {
         }
 
         executeAction.run();
+    }
+
+    public Optional<String> elementNameOnHover(int mouseX, int mouseY) {
+        if (!(buttonIsHoveredOver(mouseX, mouseY))) {
+            return Optional.empty();
+        }
+
+        if (!useConditionIsMet.get()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(name);
     }
 
     private static IconButtonConfig getConfigWhenHovered(IconButtonConfig config) {

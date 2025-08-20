@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.GuiResponder, GuiSlider.FormatHelper {
 
@@ -215,6 +216,8 @@ class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
 
         drawGuiBackground(anchorX, anchorY, width, height, offset);
 
+        drawIconButtonDescription(anchorX, anchorY, width, height, offset, mouseX, mouseY);
+
         {
             // Depth is temporarily re-enabled since entity renderer draws with depth
             GlStateManager.enableDepth();
@@ -271,8 +274,32 @@ class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.GuiRespo
 
         // Draw Nameplate
         drawRect(anchorX - (width - offset - 14) / 2, anchorY - (height - offset - 14) / 2,
-                anchorX + (-width + offset + 16 + 260) / 2, anchorY + (-height + offset + 14 + 30) / 2, 0xFF6D6D6D);
-        drawCenteredString(mc.fontRendererObj, "Wikitools Renders", anchorX - (width - offset - 14 - 130) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFFE0E0E0);
+                anchorX - (width - offset - 14 - 248 - 14) / 2, anchorY - (height - offset - 14 - 30) / 2, 0xFF6D6D6D);
+        drawCenteredString(mc.fontRendererObj, "Wikitools Renders", anchorX - (width - offset - 14 - 124 - 6) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFFE0E0E0);
+    }
+
+    private void drawIconButtonDescription(int anchorX, int anchorY, int width, int height, int offset, int mouseX, int mouseY) {
+        Optional<String> hoveredIconButtonDescription = Optional.empty();
+
+        for (IconButton iconButton : iconButtons) {
+            Optional<String> name = iconButton.elementNameOnHover(mouseX, mouseY);
+            if (name.isPresent()) {
+                hoveredIconButtonDescription = name;
+            }
+        }
+
+        if (hoveredIconButtonDescription.isPresent()) {
+            int stringWidth = mc.fontRendererObj.getStringWidth(hoveredIconButtonDescription.get());
+
+            int actualPredictedStringWidth = stringWidth + 7;
+
+            int x = anchorX - (width - offset - 14 - 10 - 256) / 2;
+            int y = anchorY - (height - offset - 14 - (10 + 40) * 7 - 54) / 2;
+
+            drawRect(x, y, x + actualPredictedStringWidth + 7, y + 15, 0xAA6D6431);
+
+            drawString(mc.fontRendererObj, hoveredIconButtonDescription.get(), x + 7, y + 4, 0xFFE0E0E0);
+        }
     }
 
     private void drawIconButtons(int mouseX, int mouseY) {
