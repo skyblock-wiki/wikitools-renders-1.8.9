@@ -1,4 +1,4 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static jdk.nashorn.internal.objects.Global.Infinity;
 
-class EntityRenderer {
+public class EntityRenderer {
 
     private static boolean renderingInProgress = false;
 

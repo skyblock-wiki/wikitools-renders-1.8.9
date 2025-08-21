@@ -1,4 +1,6 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.screen;
+
+import org.hsw.wikitoolsrenders.feature.render_entity.render.EntityRenderer;
 
 import java.util.Optional;
 import java.util.function.Consumer;

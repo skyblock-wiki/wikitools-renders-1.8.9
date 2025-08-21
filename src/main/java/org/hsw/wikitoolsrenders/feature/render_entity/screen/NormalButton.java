@@ -1,6 +1,7 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.screen;
 
 import net.minecraft.client.gui.GuiButton;
+import org.hsw.wikitoolsrenders.feature.render_entity.render.EntityRenderer;
 
 import java.util.function.Supplier;
 

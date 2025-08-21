@@ -1,7 +1,7 @@
 package org.hsw.wikitoolsrenders;
 
-import org.hsw.wikitoolsrenders.feature.render_entity.CopyFacingEntityListener;
-import org.hsw.wikitoolsrenders.feature.render_entity.RenderEntityListener;
+import org.hsw.wikitoolsrenders.feature.render_entity.listener.CopyFacingEntityListener;
+import org.hsw.wikitoolsrenders.feature.render_entity.listener.RenderEntityListener;
 import org.hsw.wikitoolsrenders.feature.remind_mod_update.ModUpdateReminder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;

@@ -1,4 +1,4 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.render;
 
 import com.google.common.io.Files;
 import org.hsw.wikitoolsrenders.WikiToolsRendersInfo;

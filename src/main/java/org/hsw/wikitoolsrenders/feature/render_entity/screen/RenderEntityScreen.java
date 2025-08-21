@@ -1,4 +1,4 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.screen;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.hsw.wikitoolsrenders.WikiToolsRendersInfo;
@@ -8,6 +8,8 @@ import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.hsw.wikitoolsrenders.WikiToolsRendersKeybinds;
+import org.hsw.wikitoolsrenders.feature.render_entity.render.EntityRenderer;
+import org.hsw.wikitoolsrenders.feature.render_entity.render.RenderableEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.GuiResponder, GuiSlider.FormatHelper {
+public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.GuiResponder, GuiSlider.FormatHelper {
 
     private List<NormalButton> normalButtons;
     private List<NormalSlider> normalSliders;

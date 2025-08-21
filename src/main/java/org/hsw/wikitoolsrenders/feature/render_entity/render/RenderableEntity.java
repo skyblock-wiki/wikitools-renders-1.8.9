@@ -1,4 +1,4 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 
-class RenderableEntity {
+public class RenderableEntity {
     private static final boolean specialRotation = true;
 
     private static int customSkinCounter = 0;

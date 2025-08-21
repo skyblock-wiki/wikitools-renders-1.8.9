@@ -1,4 +1,4 @@
-package org.hsw.wikitoolsrenders.feature.render_entity;
+package org.hsw.wikitoolsrenders.feature.render_entity.listener;
 
 import org.hsw.wikitoolsrenders.WikiToolsRendersKeybinds;
 import net.minecraft.client.Minecraft;
@@ -12,6 +12,8 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import org.hsw.wikitoolsrenders.feature.render_entity.render.ClonedClientPlayer;
+import org.hsw.wikitoolsrenders.feature.render_entity.render.EntityRenderer;
 
 import java.util.Optional;
 
