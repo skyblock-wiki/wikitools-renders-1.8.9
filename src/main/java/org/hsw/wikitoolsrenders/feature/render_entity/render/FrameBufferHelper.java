@@ -18,6 +18,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
+import scala.Tuple4;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -68,58 +69,80 @@ class FrameBufferHelper {
         return bufferedimage;
     }
 
-    public static BufferedImage trimImage(BufferedImage image) {
-        WritableRaster raster = image.getAlphaRaster();
-        int width = raster.getWidth();
-        int height = raster.getHeight();
-        int left = 0;
-        int top = 0;
-        int right = width - 1;
-        int bottom = height - 1;
-        int minRight = width - 1;
-        int minBottom = height - 1;
+    public static class TrimmedImage {
+        public final BufferedImage trimmedImage;
+        public final int horizontalBalance;  // negative if left-heavy, positive if right-heavy
+        public final int verticalBalance;  // negative if top-heavy, positive if bottom-heavy
 
-        top:
-        for (; top < bottom; top++) {
-            for (int x = 0; x < width; x++) {
-                if (raster.getSample(x, top, 0) != 0) {
-                    minRight = x;
-                    minBottom = top;
-                    break top;
-                }
-            }
+        public TrimmedImage(BufferedImage originalImage) {
+
+            Tuple4<Integer, Integer, Integer, Integer> trimBox = getTrimBox(originalImage);
+            int left = trimBox._1();
+            int top = trimBox._2();
+            int right = trimBox._3();
+            int bottom = trimBox._4();
+            int width = right - left + 1;
+            int height = bottom - top + 1;
+
+            this.trimmedImage = originalImage.getSubimage(left, top, width, height);
+
+            horizontalBalance = (originalImage.getWidth() - right - left) / 2;
+            verticalBalance = (originalImage.getHeight() - bottom - top) / 2;
         }
 
-        left:
-        for (; left < minRight; left++) {
-            for (int y = height - 1; y > top; y--) {
-                if (raster.getSample(left, y, 0) != 0) {
-                    minBottom = y;
-                    break left;
+        private static Tuple4<Integer, Integer, Integer, Integer> getTrimBox(BufferedImage image) {
+            WritableRaster raster = image.getAlphaRaster();
+            int width = raster.getWidth();
+            int height = raster.getHeight();
+            int left = 0;
+            int top = 0;
+            int right = width - 1;
+            int bottom = height - 1;
+            int minRight = width - 1;
+            int minBottom = height - 1;
+
+            top:
+            for (; top < bottom; top++) {
+                for (int x = 0; x < width; x++) {
+                    if (raster.getSample(x, top, 0) != 0) {
+                        minRight = x;
+                        minBottom = top;
+                        break top;
+                    }
                 }
             }
-        }
 
-        bottom:
-        for (; bottom > minBottom; bottom--) {
-            for (int x = width - 1; x >= left; x--) {
-                if (raster.getSample(x, bottom, 0) != 0) {
-                    minRight = x;
-                    break bottom;
+            left:
+            for (; left < minRight; left++) {
+                for (int y = height - 1; y > top; y--) {
+                    if (raster.getSample(left, y, 0) != 0) {
+                        minBottom = y;
+                        break left;
+                    }
                 }
             }
-        }
 
-        right:
-        for (; right > minRight; right--) {
-            for (int y = bottom; y >= top; y--) {
-                if (raster.getSample(right, y, 0) != 0) {
-                    break right;
+            bottom:
+            for (; bottom > minBottom; bottom--) {
+                for (int x = width - 1; x >= left; x--) {
+                    if (raster.getSample(x, bottom, 0) != 0) {
+                        minRight = x;
+                        break bottom;
+                    }
                 }
             }
-        }
 
-        return image.getSubimage(left, top, right - left + 1, bottom - top + 1);
+            right:
+            for (; right > minRight; right--) {
+                for (int y = bottom; y >= top; y--) {
+                    if (raster.getSample(right, y, 0) != 0) {
+                        break right;
+                    }
+                }
+            }
+
+            return new Tuple4<>(left, top, right, bottom);
+        }
     }
 
     public static void saveBuffer(BufferedImage bufferedImage) {
@@ -138,7 +161,7 @@ class FrameBufferHelper {
         }
     }
 
-    public static void drawEntityOnScreen(int posX, int posY, float scale, EntityLivingBase ent, boolean doSpecialRotation) {
+    public static void drawEntityOnScreen(int posX, int posY, float scale, EntityLivingBase entity, boolean doSpecialRotation) {
         GlStateManager.pushMatrix();
         GlStateManager.enableColorMaterial();
         GlStateManager.enableTexture2D();
@@ -162,7 +185,7 @@ class FrameBufferHelper {
         rendermanager.setPlayerViewY(180.0F);
         boolean oldShadows = rendermanager.isRenderShadow();
         rendermanager.setRenderShadow(false);
-        rendermanager.renderEntityWithPosYaw(ent, 0, 0, 0, 0, 1.0F);
+        rendermanager.renderEntityWithPosYaw(entity, 0, 0, 0, 0, 1.0F);
         // Fix colored things like sheep, and leather armor.
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         rendermanager.setRenderShadow(oldShadows);

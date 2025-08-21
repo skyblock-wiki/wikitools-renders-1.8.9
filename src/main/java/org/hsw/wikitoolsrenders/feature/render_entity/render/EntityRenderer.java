@@ -22,16 +22,44 @@ import java.util.Optional;
 import static jdk.nashorn.internal.objects.Global.Infinity;
 
 public class EntityRenderer {
+    private static final int heightLimitForScreenRender = 200 - 80;
+    private static final int widthLimitForScreenRender = 125 - 30;
+    private static final int longestSideForIsometricImageRender = 512;
 
     private static boolean renderingInProgress = false;
 
     private static Optional<RenderableEntity> currentEntity = Optional.empty();
+
+    private static Optional<EntityScale> currentEntityScaleForScreen = Optional.empty();
 
     private static RenderableEntity getCurrentEntity() {
         if (!currentEntity.isPresent()) {
             setCurrentEntity(ClonedClientPlayer.of(Minecraft.getMinecraft().thePlayer));
         }
         return currentEntity.get();
+    }
+
+    private static EntityScale getCurrentEntityScaleForScreen() {
+        if (!currentEntityScaleForScreen.isPresent()) {
+            ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+            int displayWidth = Minecraft.getMinecraft().displayWidth;
+            int scaledWidth = scaledResolution.getScaledWidth();
+
+            float scaleRatio = (float) displayWidth / scaledWidth;
+            int width = (int) (widthLimitForScreenRender * scaleRatio);
+            int height = (int) (heightLimitForScreenRender * scaleRatio);
+
+            EntityScale entityScale = fitCurrentEntityToBox(width, height);
+            currentEntityScaleForScreen = Optional.of(new EntityScale(
+                    entityScale.width,
+                    entityScale.height,
+                    entityScale.scale,
+                    (int) (entityScale.horizontalBalance / scaleRatio),
+                    (int) (entityScale.verticalBalance / scaleRatio)
+            ));
+        }
+
+        return currentEntityScaleForScreen.get();
     }
 
     public static boolean currentEntityIsPlayerEntity() {
@@ -59,7 +87,7 @@ public class EntityRenderer {
 
             ITextureObject textureObject = textureManager.getTexture(skin.get());
 
-            if (textureObject instanceof  ThreadDownloadImageData) {
+            if (textureObject instanceof ThreadDownloadImageData) {
                 ThreadDownloadImageData imageData = (ThreadDownloadImageData) textureObject;
                 BufferedImage bufferedImage = ReflectionHelper.getPrivateValue(ThreadDownloadImageData.class, imageData, "bufferedImage", "field_110560_d");
 
@@ -90,37 +118,91 @@ public class EntityRenderer {
     public static void setCurrentEntity(EntityLivingBase entity) {
         RenderableEntity renderableEntity = new RenderableEntity(entity);
         currentEntity = Optional.of(renderableEntity);
+        currentEntityScaleForScreen = Optional.empty();
     }
 
-    public static void saveEntityImage(int displayWidth, int displayHeight) {
+    private static EntityScale fitCurrentEntityToSquareBox(int targetLongestSide) {
+        int displayWidth = Minecraft.getMinecraft().displayWidth;
+        int displayHeight = Minecraft.getMinecraft().displayHeight;
+
+        Framebuffer framebuffer = FrameBufferHelper.createFrameBuffer(displayWidth, displayHeight);
+
+        float scale = 90;
+        BufferedImage bufferedImage = renderCurrentEntityToImage(0, scale, framebuffer).trimmedImage;
+        int currentLongestSide = longestSide(bufferedImage);
+
+        if (currentLongestSide == 0) {
+            throw new RuntimeException("Unexpected length values when finding scale to render entity");
+        }
+
+        while (currentLongestSide != targetLongestSide && currentLongestSide != targetLongestSide - 1) {
+            // scale_new / scale_current = length_target / length_current
+            // there can be rounding errors, so it takes multiple iterations to find the fit
+            scale = ((float) targetLongestSide / currentLongestSide) * scale;
+            if (scale == Infinity) {
+                break;
+            }
+            bufferedImage = renderCurrentEntityToImage(targetLongestSide, scale, framebuffer).trimmedImage;
+            currentLongestSide = longestSide(bufferedImage);
+        }
+
+        FrameBufferHelper.TrimmedImage finalImage = renderCurrentEntityToImage(bufferedImage.getHeight(), scale, framebuffer);
+        int width = finalImage.trimmedImage.getWidth();
+        int height = finalImage.trimmedImage.getHeight();
+
+        FrameBufferHelper.restoreFrameBuffer(framebuffer);
+
+        return new EntityScale(width, height, scale, finalImage.horizontalBalance, finalImage.verticalBalance);
+    }
+
+    private static EntityScale fitCurrentEntityToBox(int widthLimit, int heightLimit) {
+        EntityScale entityScale1 = fitCurrentEntityToSquareBox(widthLimit);
+        EntityScale entityScale2 = fitCurrentEntityToSquareBox(heightLimit);
+
+        boolean entityScale1IsValid = entityScale1.width <= widthLimit && entityScale1.height <= heightLimit;
+        boolean entityScale2IsValid = entityScale2.width <= widthLimit && entityScale2.height <= heightLimit;
+        boolean bothAreValid = entityScale1IsValid && entityScale2IsValid;
+
+        if (entityScale1IsValid && !entityScale2IsValid) {
+            return entityScale1;
+        }
+
+        if (!entityScale1IsValid && entityScale2IsValid) {
+            return entityScale2;
+        }
+
+        EntityScale larger = entityScale1.scale > entityScale2.scale ? entityScale1 : entityScale2;
+        EntityScale smaller = entityScale1.scale < entityScale2.scale ? entityScale1 : entityScale2;
+
+        if (bothAreValid) {
+            return larger;
+        }
+
+        // This extraordinary case should not happen
+        return smaller;
+    }
+
+    private static int longestSide(BufferedImage bufferedImage) {
+        return Math.max(bufferedImage.getWidth(), bufferedImage.getHeight());
+    }
+
+    public static void saveEntityImage() {
         startRenderingProcess(() -> {
-            int shortest = Math.min(Math.min(displayWidth, displayHeight), 512);
+            EntityScale entityScale = fitCurrentEntityToSquareBox(longestSideForIsometricImageRender);
+
+            int displayWidth = Minecraft.getMinecraft().displayWidth;
+            int displayHeight = Minecraft.getMinecraft().displayHeight;
 
             Framebuffer framebuffer = FrameBufferHelper.createFrameBuffer(displayWidth, displayHeight);
 
-            float scale = 1;
-            BufferedImage bufferedImage = renderEntity(0, scale, framebuffer);
-            int longestSide = getLongestSide(bufferedImage);
+            BufferedImage bufferedImage = renderCurrentEntityToImage(entityScale.height, entityScale.scale, framebuffer).trimmedImage;
 
-            if (longestSide != 0) {
-                // Some mobs require extremely fine scaling to equal exactly our size.
-                // Be ok with 1 pixel smaller if it cant find the exact scale fast enough.
-                while (longestSide != shortest && longestSide != shortest - 1) {
-                    scale = shortest / (longestSide / scale);
-                    if (scale == Infinity) {
-                        break;
-                    }
-                    bufferedImage = renderEntity(shortest, scale, framebuffer);
-                    longestSide = getLongestSide(bufferedImage);
-                }
-
-                FrameBufferHelper.saveBuffer(bufferedImage);
-                FrameBufferHelper.restoreFrameBuffer(framebuffer);
-            }
+            FrameBufferHelper.saveBuffer(bufferedImage);
+            FrameBufferHelper.restoreFrameBuffer(framebuffer);
         });
     }
 
-    private static BufferedImage renderEntity(int height, float scale, Framebuffer framebuffer) {
+    private static FrameBufferHelper.TrimmedImage renderCurrentEntityToImage(int height, float scale, Framebuffer framebuffer) {
         FrameBufferHelper.clearFrameBuffer();
 
         ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
@@ -129,17 +211,17 @@ public class EntityRenderer {
 
         drawCurrentEntityOnScreen(posX, posY, scale);
         BufferedImage readImage = FrameBufferHelper.readImage(framebuffer);
-        BufferedImage trimImage = FrameBufferHelper.trimImage(readImage);
 
-        return trimImage;
+        return new FrameBufferHelper.TrimmedImage(readImage);
     }
 
-    public static void drawCurrentEntityOnScreen(int posX, int posY, float scale) {
+    public static void drawCurrentEntityOnScreen(int posX, int posY) {
+        EntityScale entityScale = getCurrentEntityScaleForScreen();
+        drawCurrentEntityOnScreen(posX + entityScale.horizontalBalance, posY + entityScale.verticalBalance, entityScale.scale);
+    }
+
+    private static void drawCurrentEntityOnScreen(int posX, int posY, float scale) {
         getCurrentEntity().drawOnScreen(posX, posY, scale);
-    }
-
-    private static int getLongestSide(BufferedImage image) {
-        return Math.max(image.getWidth(), image.getHeight());
     }
 
     public static void downloadHead() {
@@ -165,7 +247,7 @@ public class EntityRenderer {
 
             // Fill with transparent pixels
             newImageG2D.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-            newImageG2D.fillRect(0,0,finalLayerSize,finalLayerSize);
+            newImageG2D.fillRect(0, 0, finalLayerSize, finalLayerSize);
 
             // Reset composite
             newImageG2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
@@ -270,11 +352,26 @@ public class EntityRenderer {
             func.run();
 
             renderingInProgress = false;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             renderingInProgress = false;
 
             throw e;
+        }
+    }
+
+    private static class EntityScale {
+        public final int width;
+        public final int height;
+        public final float scale;
+        public final int horizontalBalance;  // negative if left-heavy, positive if right-heavy
+        public final int verticalBalance;  // negative if top-heavy, positive if bottom-heavy
+
+        public EntityScale(int width, int height, float scale, int horizontalBalance, int verticalBalance) {
+            this.width = width;
+            this.height = height;
+            this.scale = scale;
+            this.horizontalBalance = horizontalBalance;
+            this.verticalBalance = verticalBalance;
         }
     }
 

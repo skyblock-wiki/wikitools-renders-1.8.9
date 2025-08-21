@@ -135,7 +135,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         IconButton.ALWAYS,
                         () -> {
                             makeButtonClickSound();
-                            EntityRenderer.saveEntityImage(mc.displayWidth, mc.displayHeight);
+                            EntityRenderer.saveEntityImage();
                         }
                 ),
                 new IconButton(
@@ -225,9 +225,9 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
             GlStateManager.enableDepth();
 
             // Gotta call this or skin is completely black
-            EntityRenderer.drawCurrentEntityOnScreen(0, 0, 0);
+            EntityRenderer.drawCurrentEntityOnScreen(0, 0);
             // Check if holding item, if so, move to the right a bit
-            EntityRenderer.drawCurrentEntityOnScreen(anchorX - (width - offset - 20 - 124) / 2, anchorY + (height - offset - 64) / 2, 90);
+            EntityRenderer.drawCurrentEntityOnScreen(anchorX - (width - offset - 20 - 125) / 2, anchorY + (height - offset - 64) / 2);
 
             GlStateManager.disableDepth();
         }
@@ -276,8 +276,8 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
 
         // Draw Nameplate
         drawRect(anchorX - (width - offset - 14) / 2, anchorY - (height - offset - 14) / 2,
-                anchorX - (width - offset - 14 - 248 - 14) / 2, anchorY - (height - offset - 14 - 30) / 2, 0xFF6D6D6D);
-        drawCenteredString(mc.fontRendererObj, "Wikitools Renders", anchorX - (width - offset - 14 - 124 - 6) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFFE0E0E0);
+                anchorX - (width - offset - 14 - 262) / 2, anchorY - (height - offset - 14 - 30) / 2, 0xFF6D6D6D);
+        drawCenteredString(mc.fontRendererObj, "Wikitools Renders", anchorX - (width - offset - 14 - 131) / 2, anchorY - (height - offset - 14 - 8) / 2, 0xFFE0E0E0);
     }
 
     private void drawIconButtonDescription(int anchorX, int anchorY, int width, int height, int offset, int mouseX, int mouseY) {
@@ -295,6 +295,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
 
             int actualPredictedStringWidth = stringWidth + 7;
 
+            // Compute top-left position of the box
             int x = anchorX - (width - offset - 14 - 10 - 256) / 2;
             int y = anchorY - (height - offset - 14 - (10 + 40) * 7 - 54) / 2;
 
