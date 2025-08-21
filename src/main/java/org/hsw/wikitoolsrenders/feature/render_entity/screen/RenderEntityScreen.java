@@ -78,7 +78,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                                 100, 20,
                                 I18n.format("wikitoolsrenders.gui.toggleInvisible")),
                         NormalButton.ALWAYS,
-                        EntityRenderer::toggleEntityInvisibility
+                        EntityRenderer::toggleEntityVisibility
                 ),
                 new NormalButton(
                         new GuiButton(removeEnchantsButtonId,
@@ -166,7 +166,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         () -> {
                             makeButtonClickSound();
                             EntityRenderer.setEntityToCurrentPlayer();
-                            resetSliders();
+                            invalidateSliders();
                         }
                 ),
                 new IconButton(
@@ -177,13 +177,13 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         () -> {
                             makeButtonClickSound();
                             EntityRenderer.setEntityToSteve();
-                            resetSliders();
+                            invalidateSliders();
                         }
                 )
         ));
     }
 
-    private void resetSliders() {
+    private void invalidateSliders() {
         for (NormalSlider normalSlider : normalSliders) {
             normalSlider.setToZero();
         }

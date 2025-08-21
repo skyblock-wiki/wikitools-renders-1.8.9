@@ -62,6 +62,10 @@ public class EntityRenderer {
         return currentEntityScaleForScreen.get();
     }
 
+    public static void invalidateCurrentEntityScale() {
+        currentEntityScaleForScreen = Optional.empty();
+    }
+
     public static boolean currentEntityIsPlayerEntity() {
         return currentEntity.isPresent() && currentEntity.get().isPlayerEntity();
     }
@@ -118,7 +122,7 @@ public class EntityRenderer {
     public static void setCurrentEntity(EntityLivingBase entity) {
         RenderableEntity renderableEntity = new RenderableEntity(entity);
         currentEntity = Optional.of(renderableEntity);
-        currentEntityScaleForScreen = Optional.empty();
+        invalidateCurrentEntityScale();
     }
 
     private static EntityScale fitCurrentEntityToSquareBox(int targetLongestSide) {
@@ -285,8 +289,8 @@ public class EntityRenderer {
         setCurrentEntity(ClonedClientPlayer.of(Minecraft.getMinecraft().thePlayer));
     }
 
-    public static void toggleEntityInvisibility() {
-        getCurrentEntity().toggleInvisibility();
+    public static void toggleEntityVisibility() {
+        getCurrentEntity().toggleVisibility();
     }
 
     public static boolean canRemoveEnchantsInEntityInventory() {
@@ -303,6 +307,7 @@ public class EntityRenderer {
 
     public static void removeHeldItemOfEntity() {
         getCurrentEntity().removeHeldItem();
+        invalidateCurrentEntityScale();
     }
 
     public static boolean canRemoveArmourPiecesOfEntity() {
@@ -311,6 +316,7 @@ public class EntityRenderer {
 
     public static void removeArmourPiecesOfEntity() {
         getCurrentEntity().removeArmourPieces();
+        invalidateCurrentEntityScale();
     }
 
     public static void toggleSmallArms() {

@@ -47,14 +47,6 @@ public class RenderableEntity {
         return entity instanceof AbstractClientPlayer;
     }
 
-    private Optional<ItemStack> getEntityInventorySlot(int i) {
-        ItemStack[] inventory = entity.getInventory();
-        if (i < inventory.length) {
-            return Optional.ofNullable(inventory[i]);
-        }
-        return Optional.empty();
-    }
-
     private Optional<AbstractClientPlayer> getAsPlayerEntity() {
         if (!isPlayerEntity()) {
             return Optional.empty();
@@ -154,7 +146,7 @@ public class RenderableEntity {
         playerEntity.ifPresent(abstractClientPlayer -> EntityRenderer.setCurrentEntity(ClonedClientPlayer.asSteve(abstractClientPlayer)));
     }
 
-    public void toggleInvisibility() {
+    public void toggleVisibility() {
         entity.setInvisible(!entity.isInvisible());
     }
 
