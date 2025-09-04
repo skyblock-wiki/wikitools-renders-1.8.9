@@ -66,8 +66,6 @@ public class CopyFacingEntityListener {
                 Entity entityFromNBT = EntityList.createEntityFromNBT(nbt, minecraft.theWorld);
                 return Optional.of((EntityLivingBase) entityFromNBT);
             }
-        } else if (WikiToolsRendersKeybinds.SELF_MODIFIER.isKeyDown()) {
-            return Optional.of(ClonedClientPlayer.of(minecraft.thePlayer));
         }
 
         return Optional.empty();

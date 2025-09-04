@@ -14,12 +14,6 @@ public class WikiToolsRendersKeybinds {
             category
     );
 
-    public static KeyBinding SELF_MODIFIER = new KeyBinding(
-            "wikitoolsrenders.keybind.selfModifier",
-            Keyboard.KEY_RMENU,
-            category
-    );
-
     public static KeyBinding HUD = new KeyBinding(
             "wikitoolsrenders.keybind.hud",
             Keyboard.KEY_K,
