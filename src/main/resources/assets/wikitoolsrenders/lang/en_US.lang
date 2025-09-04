@@ -1,5 +1,6 @@
 org.hsw.wikitoolsrenders.category=WikiTools Renders
 wikitoolsrenders.needsUpdating=WikiTools Renders has an update:
+wikitoolsrenders.fetchLatestVersionProblem=Something went wrong when finding latest WikiTools Renders version:
 wikitoolsrenders.keybind.copyEntity=Copy Entity
 wikitoolsrenders.keybind.hud=Open GUI
 wikitoolsrenders.message.copiedEntity=Copied entity

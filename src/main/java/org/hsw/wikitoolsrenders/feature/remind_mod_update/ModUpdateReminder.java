@@ -1,6 +1,8 @@
 package org.hsw.wikitoolsrenders.feature.remind_mod_update;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.gson.Gson;
+import net.minecraft.util.ChatStyle;
 import org.hsw.wikitoolsrenders.WikiToolsRendersInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -28,13 +30,28 @@ public class ModUpdateReminder {
         }
     }
 
-    private static void remindUserToUpdateMod(String updateMessage) {
-        IChatComponent ichatcomponent = new ChatComponentText(
-                I18n.format("wikitoolsrenders.needsUpdating") + " " + updateMessage);
-        ichatcomponent.getChatStyle().setChatClickEvent(
-                new ClickEvent(ClickEvent.Action.OPEN_URL, WikiToolsRendersInfo.REPOSITORY_URL));
-        ichatcomponent.getChatStyle().setUnderlined(true);
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
+    private static void remindUserToUpdateMod(String newVersionName) {
+        ChatStyle messageStyle = new ChatStyle()
+                .setChatClickEvent(
+                        new ClickEvent(ClickEvent.Action.OPEN_URL, WikiToolsRendersInfo.REPOSITORY_URL))
+                .setUnderlined(true);
+
+        IChatComponent messageComponent = new ChatComponentText(
+                I18n.format("wikitoolsrenders.needsUpdating") + " " + newVersionName)
+                .setChatStyle(messageStyle);
+
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(messageComponent);
+    }
+
+    private static void sendFailedMessage(String problemName) {
+        IChatComponent problemComponent = new ChatComponentText(problemName)
+                .setChatStyle(new ChatStyle().setItalic(true));
+
+        IChatComponent messageComponent = new ChatComponentText(
+                I18n.format("wikitoolsrenders.fetchLatestVersionProblem") + " ")
+                .appendSibling(problemComponent);
+
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(messageComponent);
     }
 
     private static Optional<String> findNewVersion() {
@@ -49,6 +66,7 @@ public class ModUpdateReminder {
             String latestVersionName = release.tag_name;
 
             if (release.tag_name == null) {
+                sendFailedMessage("LATEST_RELEASE_FETCH_PARSE_FAILURE (" + result.getStatusLine() + ")");
                 return Optional.empty();  // request failure
             }
 
@@ -59,12 +77,27 @@ public class ModUpdateReminder {
 
             return Optional.of(latestVersionName);
         } catch (IOException ignored) {
+            sendFailedMessage("LATEST_RELEASE_FETCH_FAILURE");
             return Optional.empty();
         }
     }
 
     private static boolean checkIfModNeedsUpdating(String latestVersionName) {
-        return !latestVersionName.equals(WikiToolsRendersInfo.VERSION);
+        String currentVersionName = WikiToolsRendersInfo.VERSION;
+        Optional<Version> currentVersion = Version.tryParse(currentVersionName);
+        Optional<Version> latestVersion = Version.tryParse(latestVersionName);
+
+        if (!currentVersion.isPresent() || !latestVersion.isPresent()) {
+            if (!currentVersion.isPresent()) {
+                sendFailedMessage("VERSION_PARSE_FAILURE (" + currentVersionName + ")");
+            }
+            if (!latestVersion.isPresent()) {
+                sendFailedMessage("VERSION_PARSE_FAILURE (" + latestVersionName + ")");
+            }
+            return false;
+        }
+
+        return latestVersion.get().isHigherThan(currentVersion.get());
     }
 
     private static class Release {

@@ -1,7 +1,7 @@
 // For those who want the bleeding edge
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -62,6 +62,8 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    implementation "com.github.zafarkhaja:java-semver:0.10.2"
 
     compileOnly 'org.jetbrains:annotations:26.0.2'
 }
