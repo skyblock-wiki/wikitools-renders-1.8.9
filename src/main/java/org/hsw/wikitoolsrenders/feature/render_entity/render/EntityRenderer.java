@@ -11,6 +11,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -34,7 +35,7 @@ public class EntityRenderer {
 
     private static RenderableEntity getCurrentEntity() {
         if (!currentEntity.isPresent()) {
-            setCurrentEntity(ClonedClientPlayer.of(Minecraft.getMinecraft().thePlayer));
+            setCurrentEntity(RenderableEntity.createCurrentPlayerEntity());
         }
         return currentEntity.get();
     }
@@ -62,7 +63,7 @@ public class EntityRenderer {
         return currentEntityScaleForScreen.get();
     }
 
-    public static void invalidateCurrentEntityScale() {
+    private static void invalidateCurrentEntityScale() {
         currentEntityScaleForScreen = Optional.empty();
     }
 
@@ -120,7 +121,10 @@ public class EntityRenderer {
     }
 
     public static void setCurrentEntity(EntityLivingBase entity) {
-        RenderableEntity renderableEntity = new RenderableEntity(entity);
+        setCurrentEntity(new RenderableEntity(entity));
+    }
+
+    private static void setCurrentEntity(RenderableEntity renderableEntity) {
         currentEntity = Optional.of(renderableEntity);
         invalidateCurrentEntityScale();
     }
@@ -279,14 +283,11 @@ public class EntityRenderer {
     }
 
     public static void setEntityToSteve() {
-        if (!getCurrentEntity().isPlayerEntity()) {
-            setEntityToCurrentPlayer();  // Set-to-steve requires a player entity
-        }
-        getCurrentEntity().setToSteve();
+        setCurrentEntity(RenderableEntity.createSteveEntity(currentEntity));
     }
 
     public static void setEntityToCurrentPlayer() {
-        setCurrentEntity(ClonedClientPlayer.of(Minecraft.getMinecraft().thePlayer));
+        setCurrentEntity(RenderableEntity.createCurrentPlayerEntity());
     }
 
     public static void toggleEntityVisibility() {
@@ -329,6 +330,17 @@ public class EntityRenderer {
 
     public static void setHeadYaw(float headYaw) {
         getCurrentEntity().setHeadYaw(headYaw);
+    }
+
+    public static void setEntityHeldItem(ItemStack itemStack) {
+        getCurrentEntity().setHeldItem(itemStack);
+        invalidateCurrentEntityScale();
+    }
+
+    public static boolean setEntityArmorPiece(ItemStack itemStack) {
+        boolean result = getCurrentEntity().setArmorPiece(itemStack);
+        invalidateCurrentEntityScale();
+        return result;
     }
 
     public static boolean ensurePlayerEntityInGuiIsCustomRendered(Entity entity, RenderPlayer renderPlayer, double x, double y, double z) {

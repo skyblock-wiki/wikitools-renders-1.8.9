@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -43,6 +43,24 @@ public class RenderableEntity {
         }
     }
 
+    public static RenderableEntity createCurrentPlayerEntity() {
+        return new RenderableEntity(ClonedClientPlayer.of(Minecraft.getMinecraft().thePlayer));
+    }
+
+    public static RenderableEntity createSteveEntity(Optional<RenderableEntity> fromEntity) {
+        boolean isNotPlayerEntity = !fromEntity.isPresent() || !fromEntity.get().getAsPlayerEntity().isPresent();
+        if (isNotPlayerEntity) {
+            // invalidate entity since set-to-steve requires a player entity
+            fromEntity = Optional.empty();
+        }
+        RenderableEntity renderableEntity = fromEntity.orElse(createCurrentPlayerEntity());
+        Optional<AbstractClientPlayer> playerEntity = renderableEntity.getAsPlayerEntity();
+        if (!playerEntity.isPresent()) {
+            throw new RuntimeException("Entity is not a player entity.");
+        }
+        return new RenderableEntity(ClonedClientPlayer.asSteve(playerEntity.get()));
+    }
+
     public boolean isPlayerEntity() {
         return entity instanceof AbstractClientPlayer;
     }
@@ -57,7 +75,7 @@ public class RenderableEntity {
     }
 
     public Optional<ResourceLocation> getPlayerAssociatedSkin() {
-        // This function retrieves the skin of a player from the entity object.
+        // This function retrieves the skin of ArmorPiece player from the entity object.
         // Its associated texture is ThreadDownloadImageData or SimpleTexture
         // as opposed to this.customSkin which gives DynamicTexture or SimpleTexture.
 
@@ -141,11 +159,6 @@ public class RenderableEntity {
         FrameBufferHelper.drawEntityOnScreen(posX, posY, scale, entity, specialRotation);
     }
 
-    public void setToSteve() {
-        Optional<AbstractClientPlayer> playerEntity = getAsPlayerEntity();
-        playerEntity.ifPresent(abstractClientPlayer -> EntityRenderer.setCurrentEntity(ClonedClientPlayer.asSteve(abstractClientPlayer)));
-    }
-
     public void toggleVisibility() {
         entity.setInvisible(!entity.isInvisible());
     }
@@ -188,17 +201,17 @@ public class RenderableEntity {
     }
 
     public boolean hasArmourPieces() {
-        return entity.getCurrentArmor(0) != null ||
-                entity.getCurrentArmor(1) != null ||
-                entity.getCurrentArmor(2) != null ||
-                entity.getCurrentArmor(3) != null;
+        return entity.getCurrentArmor(ArmorPiece.HELMET.armorSlotIndex) != null ||
+                entity.getCurrentArmor(ArmorPiece.CHESTPLATE.armorSlotIndex) != null ||
+                entity.getCurrentArmor(ArmorPiece.LEGGINGS.armorSlotIndex) != null ||
+                entity.getCurrentArmor(ArmorPiece.BOOTS.armorSlotIndex) != null;
     }
 
     public void removeArmourPieces() {
-        entity.setCurrentItemOrArmor(1, null);
-        entity.setCurrentItemOrArmor(2, null);
-        entity.setCurrentItemOrArmor(3, null);
-        entity.setCurrentItemOrArmor(4, null);
+        entity.setCurrentItemOrArmor(ArmorPiece.HELMET.equipmentSlotIndex, null);
+        entity.setCurrentItemOrArmor(ArmorPiece.CHESTPLATE.equipmentSlotIndex, null);
+        entity.setCurrentItemOrArmor(ArmorPiece.LEGGINGS.equipmentSlotIndex, null);
+        entity.setCurrentItemOrArmor(ArmorPiece.BOOTS.equipmentSlotIndex, null);
     }
 
     public void toggleSmallArms() {
@@ -213,6 +226,32 @@ public class RenderableEntity {
     public void setHeadYaw(float headYaw) {
         this.headYaw = headYaw;
         getAsPlayerEntity().ifPresent(this::configurePlayerEntity);
+    }
+
+    public void setHeldItem(ItemStack itemStack) {
+        ItemStack itemStackClone = itemStack.copy();
+        entity.setCurrentItemOrArmor(0, itemStackClone);
+    }
+
+    public boolean setArmorPiece(ItemStack itemStack) {
+        ItemStack itemStackClone = itemStack.copy();
+        Item item = itemStackClone.getItem();
+
+        boolean canBePlacedOnHead = item instanceof ItemBlock || item instanceof ItemSkull;
+        boolean isAnArmorPiece = item instanceof ItemArmor;
+
+        if (canBePlacedOnHead) {
+            entity.setCurrentItemOrArmor(ArmorPiece.HELMET.equipmentSlotIndex, itemStackClone);
+            return true;
+        }
+        else if (isAnArmorPiece) {
+            ItemArmor itemArmor = (ItemArmor) item;
+            ArmorPiece armorPiece = ArmorPiece.fromArmorType(itemArmor.armorType);
+            entity.setCurrentItemOrArmor(armorPiece.equipmentSlotIndex, itemStackClone);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean equalsToEntity(Entity entity) {
@@ -253,6 +292,36 @@ public class RenderableEntity {
             this.headPitch = headPitch;
             this.headYaw = headYaw;
             this.bodyYaw = bodyYaw;
+        }
+    }
+
+    private enum ArmorPiece {
+        HELMET(0, 3),
+        CHESTPLATE(1, 2),
+        LEGGINGS(2, 1),
+        BOOTS(3, 0);
+
+        public final int armorTypeIndex;
+        public final int armorSlotIndex;
+        public final int equipmentSlotIndex;
+
+        ArmorPiece(int armorTypeIndex, int armorSlotIndex) {
+            this.armorTypeIndex = armorTypeIndex;
+            this.armorSlotIndex = armorSlotIndex;
+            this.equipmentSlotIndex = armorSlotIndex + 1;
+        }
+
+        public static ArmorPiece fromArmorType(int armorType) {
+            switch (armorType) {
+                case 0:
+                    return HELMET;
+                case 1:
+                    return CHESTPLATE;
+                case 2:
+                    return LEGGINGS;
+                default:
+                    return BOOTS;
+            }
         }
     }
 }

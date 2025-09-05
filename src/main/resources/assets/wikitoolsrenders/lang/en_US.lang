@@ -1,9 +1,13 @@
 org.hsw.wikitoolsrenders.category=WikiTools Renders
+
 wikitoolsrenders.needsUpdating=WikiTools Renders has an update:
 wikitoolsrenders.fetchLatestVersionProblem=Something went wrong when finding latest WikiTools Renders version:
+
 wikitoolsrenders.keybind.copyEntity=Copy Entity
 wikitoolsrenders.keybind.hud=Open GUI
+
 wikitoolsrenders.message.copiedEntity=Copied entity
+
 wikitoolsrenders.gui.toggleInvisible=Toggle Invisible
 wikitoolsrenders.gui.removeEnchants=Remove Enchants
 wikitoolsrenders.gui.removeArmour=Remove Armour
@@ -16,3 +20,10 @@ wikitoolsrenders.gui.copySelf=Copy Self
 wikitoolsrenders.gui.downloadSkin=Download Skin
 wikitoolsrenders.gui.downloadHead=Download Head
 wikitoolsrenders.gui.saveEntityImage=Save Entity Image
+
+wikitoolsrenders.addItemToEntity.successMessage=Added item to entity
+wikitoolsrenders.addItemToEntity.failureMessage=Failed to add item to entity
+wikitoolsrenders.addItemToEntity.destinationTip.heldItem=Copies as held item by default.
+wikitoolsrenders.addItemToEntity.destinationTip.armorPiece=Copies as armor piece with Shift+Keybind.
+wikitoolsrenders.addItemToEntity.asHeldItem=as held item
+wikitoolsrenders.addItemToEntity.asArmorPiece=as armor piece
