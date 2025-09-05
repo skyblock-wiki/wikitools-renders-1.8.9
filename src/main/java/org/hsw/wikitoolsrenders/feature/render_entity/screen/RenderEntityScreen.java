@@ -114,7 +114,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         new GuiSlider(this, headPitchSliderId,
                                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 5 - 54) / 2,
                                 I18n.format("wikitoolsrenders.renderEntityGui.headPitch"), -90.0f, 90.0f, controlState.headPitch, this),
-                        NormalButton.WHEN_ENTITY_IS_PLAYER,
+                        NormalSlider.WHEN_ENTITY_IS_PLAYER,
                         EntityRenderer::setHeadPitch
                 ),
                 new NormalSlider(
@@ -122,7 +122,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         new GuiSlider(this, headYawSliderId,
                                 anchorX - (width - offset - 14 - 10 - 256) / 2, anchorY - (height - offset - 14 - (10 + 40) * 6 - 54) / 2,
                                 I18n.format("wikitoolsrenders.renderEntityGui.headYaw"), -90.0f, 90.0f, controlState.headYaw, this),
-                        NormalButton.WHEN_ENTITY_IS_PLAYER,
+                        NormalSlider.WHEN_ENTITY_IS_PLAYER,
                         EntityRenderer::setHeadYaw
                 )
         ));
@@ -139,18 +139,8 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         }
                 ),
                 new IconButton(
-                        I18n.format("wikitoolsrenders.renderEntityGui.downloadHead"),
-                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 2 - 4 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 0, 16, 16),
-                        this::drawIconButton,
-                        IconButton.WHEN_ENTITY_IS_PLAYER,
-                        () -> {
-                            makeButtonClickSound();
-                            EntityRenderer.downloadHead();
-                        }
-                ),
-                new IconButton(
                         I18n.format("wikitoolsrenders.renderEntityGui.downloadSkin"),
-                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16 * 3, 0, 16, 16),
+                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 2 - 4 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 0, 16, 16),
                         this::drawIconButton,
                         IconButton.WHEN_ENTITY_IS_PLAYER,
                         () -> {
@@ -159,8 +149,18 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         }
                 ),
                 new IconButton(
+                        I18n.format("wikitoolsrenders.renderEntityGui.downloadHead"),
+                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16 * 2, 0, 16, 16),
+                        this::drawIconButton,
+                        IconButton.WHEN_ENTITY_IS_PLAYER,
+                        () -> {
+                            makeButtonClickSound();
+                            EntityRenderer.downloadHead();
+                        }
+                ),
+                new IconButton(
                         I18n.format("wikitoolsrenders.renderEntityGui.copySelf"),
-                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 4 - 4 * 3 - 14) / 2, anchorY - (height - offset - 14) / 2, 16 * 2, 0, 16, 16),
+                        new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 4 - 4 * 3 - 14) / 2, anchorY - (height - offset - 14) / 2, 16 * 3, 0, 16, 16),
                         this::drawIconButton,
                         IconButton.ALWAYS,
                         () -> {

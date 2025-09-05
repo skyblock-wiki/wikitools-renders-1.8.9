@@ -14,8 +14,8 @@ class IconButton {
     private final String name;
 
     private final IconButtonConfig iconButtonConfig;
-
-    private final IconButtonConfig iconButtonConfigOnHover;
+    private final IconButtonConfig iconButtonConfigForHovered;
+    private final IconButtonConfig iconButtonConfigForDisabled;
 
     private final Consumer<IconButtonConfig> onDraw;
 
@@ -32,7 +32,8 @@ class IconButton {
     ) {
         this.name = name;
         this.iconButtonConfig = iconButtonConfig;
-        this.iconButtonConfigOnHover = getConfigWhenHovered(iconButtonConfig);
+        this.iconButtonConfigForHovered = getConfigForHovered(iconButtonConfig);
+        this.iconButtonConfigForDisabled = getConfigForDisabled(iconButtonConfig);
         this.onDraw = onDraw;
         this.useConditionIsMet = useConditionIsMet;
         this.executeAction = executeAction;
@@ -44,15 +45,20 @@ class IconButton {
     }
 
     public void drawElement(int mouseX, int mouseY) {
-        if (!useConditionIsMet.get()) {
+        boolean drawAsDisabled = !useConditionIsMet.get();
+        boolean drawAsHovered = !drawAsDisabled && buttonIsHoveredOver(mouseX, mouseY);
+
+        if (drawAsDisabled) {
+            onDraw.accept(iconButtonConfigForDisabled);
             return;
         }
 
-        if (buttonIsHoveredOver(mouseX, mouseY)) {
-            onDraw.accept(iconButtonConfigOnHover);
-        } else {
-            onDraw.accept(iconButtonConfig);
+        if (drawAsHovered) {
+            onDraw.accept(iconButtonConfigForHovered);
+            return;
         }
+
+        onDraw.accept(iconButtonConfig);
     }
 
     public void elementClicked(int mouseX, int mouseY) {
@@ -72,19 +78,26 @@ class IconButton {
             return Optional.empty();
         }
 
-        if (!useConditionIsMet.get()) {
-            return Optional.empty();
-        }
-
         return Optional.of(name);
     }
 
-    private static IconButtonConfig getConfigWhenHovered(IconButtonConfig config) {
+    private static IconButtonConfig getConfigForHovered(IconButtonConfig config) {
         return new IconButtonConfig(
                 config.x,
                 config.y,
                 config.sourceX,
                 config.sourceY + config.height,
+                config.width,
+                config.height
+        );
+    }
+
+    private static IconButtonConfig getConfigForDisabled(IconButtonConfig config) {
+        return new IconButtonConfig(
+                config.x,
+                config.y,
+                config.sourceX,
+                config.sourceY + (2 * config.height),
                 config.width,
                 config.height
         );

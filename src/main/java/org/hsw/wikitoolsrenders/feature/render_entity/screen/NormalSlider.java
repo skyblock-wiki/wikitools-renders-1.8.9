@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class NormalSlider {
-    public static final Supplier<Boolean> WHENEVER = () -> true;
-
     public static final Supplier<Boolean> WHEN_ENTITY_IS_PLAYER = EntityRenderer::currentEntityIsPlayerEntity;
 
     private final float minValue;
