@@ -1,7 +1,7 @@
 package org.hsw.wikitoolsrenders.feature.render_entity.screen;
 
 import net.minecraft.client.renderer.GlStateManager;
-import org.hsw.wikitoolsrenders.WikiToolsRendersInfo;
+import org.hsw.wikitoolsrenders.WikiToolsRendersIdentity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.*;
@@ -23,7 +23,7 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
     private List<NormalSlider> normalSliders;
     private List<IconButton> iconButtons;
 
-    private final ResourceLocation uiComponentsImage = new ResourceLocation(WikiToolsRendersInfo.MODID, "ui_components.png");
+    private final ResourceLocation uiComponentsImage = new ResourceLocation(WikiToolsRendersIdentity.MODID, "ui_components.png");
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {

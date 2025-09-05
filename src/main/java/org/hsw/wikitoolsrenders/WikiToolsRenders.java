@@ -1,6 +1,5 @@
 package org.hsw.wikitoolsrenders;
 
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.hsw.wikitoolsrenders.feature.render_entity.listener.AddItemToEntityListener;
 import org.hsw.wikitoolsrenders.feature.render_entity.listener.CopyFacingEntityListener;
 import org.hsw.wikitoolsrenders.feature.render_entity.listener.RenderEntityListener;
@@ -10,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
-@Mod(modid = WikiToolsRendersInfo.MODID, version = WikiToolsRendersInfo.VERSION, clientSideOnly = true)
+@Mod(modid = WikiToolsRendersIdentity.MODID, version = WikiToolsRendersIdentity.VERSION, clientSideOnly = true)
 public class WikiToolsRenders {
 
     @EventHandler

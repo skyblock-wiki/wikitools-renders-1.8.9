@@ -1,6 +1,9 @@
 package org.hsw.wikitoolsrenders;
 
-public class WikiToolsRendersInfo {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class WikiToolsRendersIdentity {
 
     public static final String MODID = "wikitoolsrenders";
     public static final String VERSION = "2.6.7-beta.2";
@@ -9,5 +12,9 @@ public class WikiToolsRendersInfo {
             "https://github.com/skyblock-wiki/wikitools-renders-1.8.9/releases/latest";
     public static final String RELEASES_QUERY_URL =
             "https://api.github.com/repos/skyblock-wiki/wikitools-renders-1.8.9/releases/latest";
+
+    public static Logger getLogger() {
+        return LogManager.getLogger(MODID);
+    }
 
 }
