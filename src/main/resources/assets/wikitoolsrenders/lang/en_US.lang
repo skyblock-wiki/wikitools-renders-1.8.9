@@ -1,28 +1,28 @@
-org.hsw.wikitoolsrenders.category=WikiTools Renders
-
-wikitoolsrenders.needsUpdating=WikiTools Renders has an update: %s.
-wikitoolsrenders.updateLinkText=Click here to see the new version.
-
+wikitoolsrenders.keybind.category=WikiTools Renders
 wikitoolsrenders.keybind.copyEntity=Copy Entity
 wikitoolsrenders.keybind.hud=Open GUI
 
-wikitoolsrenders.message.copiedEntity=Copied entity
+wikitoolsrenders.remindModUpdate.needsUpdating=WikiTools Renders has an update: %s.
+wikitoolsrenders.remindModUpdate.updateLinkText=Click here to see the new version.
 
-wikitoolsrenders.gui.toggleInvisible=Toggle Invisible
-wikitoolsrenders.gui.removeEnchants=Remove Enchants
-wikitoolsrenders.gui.removeArmour=Remove Armour
-wikitoolsrenders.gui.removeItem=Remove Item
-wikitoolsrenders.gui.headPitch=Head Pitch
-wikitoolsrenders.gui.headYaw=Head Yaw
-wikitoolsrenders.gui.toggleSmallArms=Toggle Small Arms
-wikitoolsrenders.gui.setSteve=Set to Steve
-wikitoolsrenders.gui.copySelf=Copy Self
-wikitoolsrenders.gui.downloadSkin=Download Skin
-wikitoolsrenders.gui.downloadHead=Download Head
-wikitoolsrenders.gui.saveEntityImage=Save Entity Image
+wikitoolsrenders.renderEntityGui.header=WikiTools Renders
+wikitoolsrenders.renderEntityGui.toggleInvisible=Toggle Invisible
+wikitoolsrenders.renderEntityGui.removeEnchants=Remove Enchants
+wikitoolsrenders.renderEntityGui.removeArmour=Remove Armour
+wikitoolsrenders.renderEntityGui.removeItem=Remove Item
+wikitoolsrenders.renderEntityGui.headPitch=Head Pitch
+wikitoolsrenders.renderEntityGui.headYaw=Head Yaw
+wikitoolsrenders.renderEntityGui.toggleSmallArms=Toggle Small Arms
+wikitoolsrenders.renderEntityGui.setSteve=Set to Steve
+wikitoolsrenders.renderEntityGui.copySelf=Copy Self
+wikitoolsrenders.renderEntityGui.downloadSkin=Download Skin
+wikitoolsrenders.renderEntityGui.downloadHead=Download Head
+wikitoolsrenders.renderEntityGui.saveEntityImage=Save Entity Image
 
-wikitoolsrenders.addItemToEntity.successMessage=Added item to entity
-wikitoolsrenders.addItemToEntity.failureMessage=Failed to add item to entity
+wikitoolsrenders.copyFacingEntity.success=Copied entity
+
+wikitoolsrenders.addItemToEntity.success=Added item to entity
+wikitoolsrenders.addItemToEntity.failure=Failed to add item to entity
 wikitoolsrenders.addItemToEntity.destinationTip.heldItem=Copies as held item by default.
 wikitoolsrenders.addItemToEntity.destinationTip.armorPiece=Copies as armor piece with Shift+Keybind.
 wikitoolsrenders.addItemToEntity.asHeldItem=as held item

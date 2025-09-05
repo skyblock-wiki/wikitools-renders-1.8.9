@@ -6,7 +6,7 @@ import org.lwjgl.input.Keyboard;
 
 public class WikiToolsRendersKeybinds {
 
-    private static String category = "org.hsw.wikitoolsrenders.category";
+    private static String category = "wikitoolsrenders.keybind.category";
 
     public static KeyBinding COPY_ENTITY = new KeyBinding(
             "wikitoolsrenders.keybind.copyEntity",

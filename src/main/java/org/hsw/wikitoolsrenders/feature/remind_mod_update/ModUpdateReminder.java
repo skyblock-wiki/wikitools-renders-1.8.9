@@ -28,7 +28,7 @@ public class ModUpdateReminder {
     }
 
     private static void remindUserToUpdateMod(String newVersionName) {
-        IChatComponent frontComponent = new ChatComponentTranslation("wikitoolsrenders.needsUpdating", newVersionName)
+        IChatComponent frontComponent = new ChatComponentTranslation("wikitoolsrenders.remindModUpdate.needsUpdating", newVersionName)
                 .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GREEN));
 
         ChatStyle linkStyle = new ChatStyle()
@@ -37,7 +37,7 @@ public class ModUpdateReminder {
                 .setChatClickEvent(
                         new ClickEvent(ClickEvent.Action.OPEN_URL, WikiToolsRendersIdentity.REPOSITORY_URL));
 
-        IChatComponent linkComponent = new ChatComponentTranslation("wikitoolsrenders.updateLinkText")
+        IChatComponent linkComponent = new ChatComponentTranslation("wikitoolsrenders.remindModUpdate.updateLinkText")
                 .setChatStyle(linkStyle);
 
         IChatComponent messageComponent = new ChatComponentText("")

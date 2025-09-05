@@ -62,7 +62,7 @@ public class AddItemToEntityListener {
                 new ChatStyle().setChatHoverEvent(
                         new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 new ChatComponentText(tipInfo))));
-        IChatComponent outputText = new ChatComponentText(I18n.format("wikitoolsrenders.addItemToEntity.successMessage")).appendText("\n")
+        IChatComponent outputText = new ChatComponentText(I18n.format("wikitoolsrenders.addItemToEntity.success")).appendText("\n")
                 .appendText("└ ").appendText(I18n.format("wikitoolsrenders.addItemToEntity.asHeldItem")).appendText(" ").appendSibling(destinationTip);
         Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(outputText);
     }
@@ -82,7 +82,7 @@ public class AddItemToEntityListener {
                 new ChatStyle().setChatHoverEvent(
                         new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 new ChatComponentText(tipInfo))));
-        String message = success ? I18n.format("wikitoolsrenders.addItemToEntity.successMessage") : I18n.format("wikitoolsrenders.addItemToEntity.failureMessage");
+        String message = success ? I18n.format("wikitoolsrenders.addItemToEntity.success") : I18n.format("wikitoolsrenders.addItemToEntity.failure");
         IChatComponent outputText = new ChatComponentText(message).appendText("\n")
                 .appendText("└ ").appendText(I18n.format("wikitoolsrenders.addItemToEntity.asArmorPiece")).appendText(" ").appendSibling(destinationTip);
         if (!success) {

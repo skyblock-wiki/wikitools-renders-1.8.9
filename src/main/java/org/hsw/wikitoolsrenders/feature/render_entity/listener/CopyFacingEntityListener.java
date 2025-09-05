@@ -51,7 +51,7 @@ public class CopyFacingEntityListener {
         EntityRenderer.setCurrentEntity(livingEntity.get());
 
         Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
-                new ChatComponentText(I18n.format("wikitoolsrenders.message.copiedEntity")));
+                new ChatComponentText(I18n.format("wikitoolsrenders.copyFacingEntity.success")));
     }
 
     private static Optional<EntityLivingBase> getLivingEntity(Entity entity) {
