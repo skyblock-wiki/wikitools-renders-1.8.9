@@ -1,5 +1,8 @@
 package org.hsw.wikitoolsrenders.feature.render_entity.screen;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.util.ResourceLocation;
 import org.hsw.wikitoolsrenders.feature.render_entity.render.EntityRenderer;
 
 import java.util.Optional;
@@ -70,6 +73,8 @@ class IconButton {
             return;
         }
 
+        makeButtonClickSound();
+
         executeAction.run();
     }
 
@@ -119,5 +124,10 @@ class IconButton {
             this.width = width;
             this.height = height;
         }
+    }
+
+    private void makeButtonClickSound() {
+        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(
+                new ResourceLocation("gui.button.press"), 1.0F));
     }
 }

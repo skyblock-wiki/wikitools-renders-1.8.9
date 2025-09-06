@@ -82,6 +82,15 @@ public class ModUpdateReminder {
     }
 
     private static boolean checkIfModNeedsUpdating(String latestVersionName) {
+        // This assumes the current version to be any valid version using SemVer
+        // (Correct: 2.0.0, 2.0.0-beta.1)
+
+        // This assumes the latest version to have no prerelease tag
+        // (Correct: v2.0.0; Incorrect: v2.0.0-beta.1)
+
+        // Hence we assume no case where the latest version is a higher prerelease version
+        // and which we do not want to remind users of.
+
         String currentVersionName = WikiToolsRendersIdentity.VERSION;
 
         Optional<Version> currentVersion = getVersion(currentVersionName);

@@ -3,7 +3,6 @@ package org.hsw.wikitoolsrenders.feature.render_entity.screen;
 import net.minecraft.client.renderer.GlStateManager;
 import org.hsw.wikitoolsrenders.WikiToolsRendersIdentity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -133,30 +132,21 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         new IconButton.IconButtonConfig(anchorX + (width - offset - 32 - 14) / 2, anchorY - (height - offset - 14) / 2, 0, 0, 16, 16),
                         this::drawIconButton,
                         IconButton.ALWAYS,
-                        () -> {
-                            makeButtonClickSound();
-                            EntityRenderer.saveEntityImage();
-                        }
+                        EntityRenderer::saveEntityImage
                 ),
                 new IconButton(
                         I18n.format("wikitoolsrenders.renderEntityGui.downloadSkin"),
                         new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 2 - 4 - 14) / 2, anchorY - (height - offset - 14) / 2, 16, 0, 16, 16),
                         this::drawIconButton,
                         IconButton.WHEN_ENTITY_IS_PLAYER,
-                        () -> {
-                            makeButtonClickSound();
-                            EntityRenderer.downloadSkin();
-                        }
+                        EntityRenderer::downloadSkin
                 ),
                 new IconButton(
                         I18n.format("wikitoolsrenders.renderEntityGui.downloadHead"),
                         new IconButton.IconButtonConfig(anchorX + (width - offset - 32 * 3 - 4 * 2 - 14) / 2, anchorY - (height - offset - 14) / 2, 16 * 2, 0, 16, 16),
                         this::drawIconButton,
                         IconButton.WHEN_ENTITY_IS_PLAYER,
-                        () -> {
-                            makeButtonClickSound();
-                            EntityRenderer.downloadHead();
-                        }
+                        EntityRenderer::downloadHead
                 ),
                 new IconButton(
                         I18n.format("wikitoolsrenders.renderEntityGui.copySelf"),
@@ -164,7 +154,6 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         this::drawIconButton,
                         IconButton.ALWAYS,
                         () -> {
-                            makeButtonClickSound();
                             EntityRenderer.setEntityToCurrentPlayer();
                             invalidateSliders();
                         }
@@ -175,7 +164,6 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
                         this::drawIconButton,
                         IconButton.ALWAYS,
                         () -> {
-                            makeButtonClickSound();
                             EntityRenderer.setEntityToSteve();
                             invalidateSliders();
                         }
@@ -324,10 +312,6 @@ public class RenderEntityScreen extends GuiScreen implements GuiPageButtonList.G
         for (IconButton iconButton : iconButtons) {
             iconButton.elementClicked(mouseX, mouseY);
         }
-    }
-
-    private void makeButtonClickSound() {
-        mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
     }
 
     @Override

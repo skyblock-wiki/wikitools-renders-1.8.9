@@ -24,6 +24,6 @@ wikitoolsrenders.copyFacingEntity.success=Copied entity
 wikitoolsrenders.addItemToEntity.success=Added item to entity
 wikitoolsrenders.addItemToEntity.failure=Failed to add item to entity
 wikitoolsrenders.addItemToEntity.destinationTip.heldItem=Copies as held item by default.
-wikitoolsrenders.addItemToEntity.destinationTip.armorPiece=Copies as armor piece with Shift+Keybind.
+wikitoolsrenders.addItemToEntity.destinationTip.armorPiece=Copies as armor piece with Shift+Key.
 wikitoolsrenders.addItemToEntity.asHeldItem=as held item
 wikitoolsrenders.addItemToEntity.asArmorPiece=as armor piece
