@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 public class WikiToolsRendersIdentity {
 
-    public static final String MODID = "wikitoolsrenders";
-    public static final String VERSION = "2.6.7-beta.2";
+    public static final String MODID = "${GRADLE_MOD_ID}";
+    public static final String VERSION = "${GRADLE_MOD_VERSION}";
 
     public static final String REPOSITORY_URL =
             "https://github.com/skyblock-wiki/wikitools-renders-1.8.9/releases/latest";

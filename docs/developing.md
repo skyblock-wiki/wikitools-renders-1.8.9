@@ -1,7 +1,7 @@
 ## Developer Notes
 
-- When bumping version, pay attention that the version number exists in two places: `build.gradle` and `WikiToolsRendersIdentity.java`.
-- Mod settings exist in three places: `build.gradle`, `mcmod.info`, and `WikiToolsRendersIdentity.java`.
+- When bumping version, modify `gradle.properties`.
+- Mod settings may exist in these places: `gradle.properties`, `build.gradle`, `mcmod.info`, and `WikiToolsRendersIdentity.java`.
 
 ## Current Practices
 

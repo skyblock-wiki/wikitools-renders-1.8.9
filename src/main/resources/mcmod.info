@@ -1,8 +1,8 @@
 [
   {
-    "modid": "wikitoolsrenders",
-    "name": "WikiTools Renders",
-    "description": "A mod to render images for use on Minecraft based Wikis.",
+    "modid": "${modid}",
+    "name": "${name}",
+    "description": "${description}",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "",
